@@ -1,5 +1,11 @@
 https://omerzshahar.itch.io/one-patient-left
 
+
+- for UML:
+[(PDF)](Assets/Planning/One-Patient-Left UML.pdf)
+
+
+
 # One Patient Left
 *A 2D narrative survival game in a semi-open world after a mysterious zombie pandemic.*
 
