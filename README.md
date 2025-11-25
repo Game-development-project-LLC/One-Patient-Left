@@ -2,7 +2,7 @@ https://omerzshahar.itch.io/one-patient-left
 
 
 - for UML:
-[(PDF)](Assets/Planning/One-Patient-Left UML.pdf)
+- [Download the report (PDF)]([https://github.com/USER/REPO/blob/main/docs/Report.pdf](https://github.com/Game-development-project-LLC/One-Patient-Left/blob/main/Assets/Planning/One-Patient-Left%20UML.pdf))
 
 
 
