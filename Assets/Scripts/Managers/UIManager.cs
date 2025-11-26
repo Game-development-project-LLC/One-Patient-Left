@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 
 /// <summary>
-/// Handles simple UI: interaction prompt and info messages.
+/// Handles simple UI: interaction prompt, info messages and game over panel.
 /// </summary>
 public class UIManager : MonoBehaviour
 {
@@ -11,6 +11,10 @@ public class UIManager : MonoBehaviour
     [Header("UI References")]
     public TMP_Text promptText;
     public TMP_Text infoText;
+
+    [Header("Game Over UI")]
+    public GameObject gameOverPanel;   // panel with dark background
+    public TMP_Text gameOverText;      // text inside the panel
 
     private void Awake()
     {
@@ -21,15 +25,18 @@ public class UIManager : MonoBehaviour
         }
 
         Instance = this;
-        // For now we stay only in this scene, no need for DontDestroyOnLoad.
     }
 
     private void Start()
     {
         HidePrompt();
         ClearInfo();
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);   // make sure it's hidden at start
     }
 
+    // ===== Prompt =====
     public void ShowPrompt(string text)
     {
         if (promptText == null) return;
@@ -43,6 +50,7 @@ public class UIManager : MonoBehaviour
         promptText.gameObject.SetActive(false);
     }
 
+    // ===== Info =====
     public void ShowInfo(string text)
     {
         if (infoText == null) return;
@@ -54,5 +62,21 @@ public class UIManager : MonoBehaviour
     {
         if (infoText == null) return;
         infoText.text = "";
+    }
+
+    // ===== Game Over =====
+    public void ShowGameOver(string message)
+    {
+        if (gameOverText != null)
+            gameOverText.text = message;
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+    }
+
+    public void HideGameOver()
+    {
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
     }
 }
