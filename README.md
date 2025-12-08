@@ -4,7 +4,7 @@ https://omerzshahar.itch.io/one-patient-left
 - for UML:
 - [Download the UML](Assets/Planning/One-Patient-Left UML.pdf](https://github.com/Game-development-project-LLC/One-Patient-Left/blob/main/Assets/Planning/One-Patient-Left-UML.pdf)
 
-# One Patient Left – תיעוד קוד
+# One Patient Left 
 
 ## תיאור קצר של המשחק
 משחק התגנבות קצר בבית חולים:
