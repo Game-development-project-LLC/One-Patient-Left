@@ -10,7 +10,8 @@ public class SimpleInteractable2D : Interactable2D
     public enum SimpleInteractionType
     {
         ShowText,
-        PickupItem
+        PickupItem,
+        RemoveObject
     }
 
     [Header("Interaction Type")]
@@ -35,6 +36,12 @@ public class SimpleInteractable2D : Interactable2D
     [Tooltip("If false, interaction will only work once.")]
     [SerializeField] private bool canInteractMultipleTimes = false;
 
+    [Header("Remove Object Settings")]
+    [SerializeField] private GameObject objectToRemove;
+
+    [Tooltip("If true, will just deactivate the object instead of destroying it.")]
+    [SerializeField] private bool deactivateInsteadOfDestroy = false;
+
     private bool alreadyInteracted = false;
 
     public override void Interact(PlayerInteraction2D player)
@@ -57,6 +64,24 @@ public class SimpleInteractable2D : Interactable2D
         }
     }
 
+    private void RemoveObject()
+    {
+        // אם לא הוגדר אובייקט, נשתמש בעצמנו
+        GameObject target = objectToRemove != null ? objectToRemove : gameObject;
+
+        if (deactivateInsteadOfDestroy)
+        {
+            target.SetActive(false);
+        }
+        else
+        {
+            Destroy(target);
+        }
+
+        // אפשר גם להציג טקסט אם הוגדר
+        ShowInfoText();
+    }
+
     private void HandleInteraction(PlayerInteraction2D player)
     {
         switch (interactionType)
@@ -67,6 +92,10 @@ public class SimpleInteractable2D : Interactable2D
 
             case SimpleInteractionType.PickupItem:
                 PickupItem(player);
+                break;
+
+            case SimpleInteractionType.RemoveObject:
+                RemoveObject();
                 break;
         }
     }
