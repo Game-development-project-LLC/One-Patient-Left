@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Shows a simple instructions panel at the start of the level,
-/// and lets the player toggle it with a key (for example: H).
+/// Shows an instructions panel at the start of the level,
+/// and lets the player toggle it with a key.
 /// </summary>
 public class InstructionsController : MonoBehaviour
 {
@@ -16,13 +16,12 @@ public class InstructionsController : MonoBehaviour
     [Tooltip("Keyboard key to toggle the instructions panel.")]
     [SerializeField] private KeyCode toggleKey = KeyCode.H;
 
-    private bool isVisible = false;
+    private bool isVisible;
 
     private void Start()
     {
         if (instructionsPanel == null)
         {
-            Debug.LogWarning("InstructionsController: instructionsPanel is not assigned.");
             return;
         }
 
@@ -32,7 +31,8 @@ public class InstructionsController : MonoBehaviour
         }
         else
         {
-            HideInstructions();
+            instructionsPanel.SetActive(false);
+            isVisible = false;
         }
     }
 

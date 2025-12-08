@@ -10,12 +10,12 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     [Header("UI References")]
-    public TMP_Text promptText;
-    public TMP_Text infoText;
+    [SerializeField] private TMP_Text promptText;
+    [SerializeField] private TMP_Text infoText;
 
     [Header("Game Over UI")]
-    public GameObject gameOverPanel;   // panel with dark background
-    public TMP_Text gameOverText;      // text inside the panel
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private TMP_Text gameOverText;
 
     private void Awake()
     {
@@ -34,56 +34,83 @@ public class UIManager : MonoBehaviour
         ClearInfo();
 
         if (gameOverPanel != null)
-            gameOverPanel.SetActive(false);   // make sure it's hidden at start
+        {
+            gameOverPanel.SetActive(false);
+        }
     }
 
     // ===== Prompt =====
     public void ShowPrompt(string text)
     {
-        if (promptText == null) return;
+        if (promptText == null)
+        {
+            return;
+        }
+
         promptText.text = text;
         promptText.gameObject.SetActive(true);
     }
 
     public void HidePrompt()
     {
-        if (promptText == null) return;
+        if (promptText == null)
+        {
+            return;
+        }
+
+        promptText.text = string.Empty;
         promptText.gameObject.SetActive(false);
     }
 
     // ===== Info =====
     public void ShowInfo(string text)
     {
-        if (infoText == null) return;
+        if (infoText == null)
+        {
+            return;
+        }
+
         infoText.text = text;
         infoText.gameObject.SetActive(true);
     }
 
     public void ClearInfo()
     {
-        if (infoText == null) return;
-        infoText.text = "";
+        if (infoText == null)
+        {
+            return;
+        }
+
+        infoText.text = string.Empty;
     }
 
     // ===== Game Over =====
     public void ShowGameOver(string message)
     {
         if (gameOverText != null)
+        {
             gameOverText.text = message;
+        }
 
         if (gameOverPanel != null)
+        {
             gameOverPanel.SetActive(true);
+        }
     }
 
     public void HideGameOver()
     {
         if (gameOverPanel != null)
+        {
             gameOverPanel.SetActive(false);
+        }
     }
 
+    /// <summary>
+    /// Reloads the currently active scene. Hook this to the Restart button.
+    /// </summary>
     public void RestartLevel()
     {
-        // טוען מחדש את הסצנה הנוכחית
         var scene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(scene.name);
     }

@@ -10,7 +10,7 @@ public class ZombieChasePlayer2D : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 4f;
 
-    [Tooltip("If true, will try to copy the player's normal move speed on Awake.")]
+    [Tooltip("If true, copies the player's normal move speed on Awake when found.")]
     [SerializeField] private bool matchPlayerSpeed = true;
 
     [Header("Detection")]
@@ -27,7 +27,22 @@ public class ZombieChasePlayer2D : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // אם לא חיברנו ידנית את השחקן, ננסה למצוא אותו אוטומטית
+        // If the player reference is not set manually, try to find it automatically.
+#if UNITY_2023_1_OR_NEWER
+        if (playerTransform == null)
+        {
+            var player = Object.FindAnyObjectByType<PlayerMovement2D>();
+            if (player != null)
+            {
+                playerTransform = player.transform;
+
+                if (matchPlayerSpeed)
+                {
+                    moveSpeed = player.getNormalSpeed();
+                }
+            }
+        }
+#else
         if (playerTransform == null)
         {
             var player = FindObjectOfType<PlayerMovement2D>();
@@ -41,32 +56,33 @@ public class ZombieChasePlayer2D : MonoBehaviour
                 }
             }
         }
+#endif
     }
 
     private void FixedUpdate()
     {
         if (playerTransform == null)
         {
-            return; // אין שחקן לתקוף
+            return; // no player to chase
         }
 
         Vector2 zombiePosition = rb.position;
         Vector2 playerPosition = playerTransform.position;
         float distanceToPlayer = Vector2.Distance(zombiePosition, playerPosition);
 
-        // התחלת רדיפה
+        // Start chasing
         if (!isChasing && distanceToPlayer <= detectionRadius)
         {
             isChasing = true;
         }
 
-        // הפסקת רדיפה
+        // Stop chasing
         if (isChasing && distanceToPlayer >= loseRadius)
         {
             isChasing = false;
         }
 
-        // תנועה רק כשאנחנו במצב רדיפה
+        // Move only while chasing
         if (isChasing)
         {
             Vector2 direction = (playerPosition - zombiePosition).normalized;
@@ -79,7 +95,7 @@ public class ZombieChasePlayer2D : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        // עוזר לראות את רדיוסי הגילוי/איבוד בסצנה
+        // Visualize detection and lose radii in the Scene view
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
 

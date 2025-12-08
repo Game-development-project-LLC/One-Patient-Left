@@ -3,24 +3,29 @@ using UnityEngine;
 
 /// <summary>
 /// Very simple inventory: keeps a list of string item IDs,
-/// like "photo", "staff_keycard", etc.
-/// Attach this to the Player.
-/// Press I to show/hide inventory contents on screen.
+/// like "photo", "staff_keycard", etc. Attach this to the Player.
 /// </summary>
 public class PlayerInventory : MonoBehaviour
 {
+    [Header("Inventory Input")]
+    [SerializeField] private KeyCode inventoryToggleKey = KeyCode.I;
+
     // Simple string-based inventory
-    private List<string> items = new List<string>();
+    private readonly List<string> items = new List<string>();
 
     // For toggling inventory display
     private bool inventoryVisible = false;
 
     /// <summary>
-    /// Add an item ID to the inventory.
-    /// Example: AddItem("photo");
+    /// Add an item ID to the inventory. Example: AddItem("photo");
     /// </summary>
     public void AddItem(string itemId)
     {
+        if (string.IsNullOrWhiteSpace(itemId))
+        {
+            return;
+        }
+
         if (!items.Contains(itemId))
         {
             items.Add(itemId);
@@ -34,32 +39,31 @@ public class PlayerInventory : MonoBehaviour
     /// </summary>
     public bool HasItem(string itemId)
     {
+        if (string.IsNullOrWhiteSpace(itemId))
+        {
+            return false;
+        }
+
         return items.Contains(itemId);
     }
 
     /// <summary>
-    /// Optional: remove item if you ever need it.
-    /// </summary>
-    public bool RemoveItem(string itemId)
-    {
-        return items.Remove(itemId);
-    }
-
-    /// <summary>
-    /// Returns inventory contents as a readable string.
+    /// Text representation of current inventory contents.
     /// </summary>
     public string GetInventoryText()
     {
         if (items.Count == 0)
+        {
             return "Inventory: (empty)";
+        }
 
         return "Inventory: " + string.Join(", ", items);
     }
 
     private void Update()
     {
-        // Press I to toggle inventory display
-        if (Input.GetKeyDown(KeyCode.I))
+        // Toggle inventory display
+        if (Input.GetKeyDown(inventoryToggleKey))
         {
             inventoryVisible = !inventoryVisible;
 
@@ -70,7 +74,7 @@ public class PlayerInventory : MonoBehaviour
             }
             else
             {
-                // Hide inventory text (does not hide prompt)
+                // Hide inventory text (does not hide interaction prompt)
                 UIManager.Instance?.ClearInfo();
             }
         }

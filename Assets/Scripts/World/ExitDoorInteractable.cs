@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Exit door of the ward. Requires a specific inventory item (e.g. staff keycard) to open.
+/// Exit door of the ward. Requires a specific inventory item to open
+/// (for example a staff keycard).
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class ExitDoorInteractable : Interactable2D
@@ -32,7 +33,7 @@ public class ExitDoorInteractable : Interactable2D
 
     public override void Interact(PlayerInteraction2D player)
     {
-        PlayerInventory inventory = player.GetComponent<PlayerInventory>();
+        var inventory = player.GetComponent<PlayerInventory>();
 
         bool hasRequiredItem =
             inventory != null &&

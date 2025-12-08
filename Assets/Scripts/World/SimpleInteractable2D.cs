@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// Generic interactable for simple room objects:
 /// - Show text (e.g. window, bed)
 /// - Pick up an item (e.g. keycard, photo)
+/// - Remove / hide an object (e.g. fake wall)
 /// </summary>
 public class SimpleInteractable2D : Interactable2D
 {
@@ -15,7 +17,9 @@ public class SimpleInteractable2D : Interactable2D
     }
 
     [Header("Interaction Type")]
-    [SerializeField] private SimpleInteractionType interactionType = SimpleInteractionType.ShowText;
+    [SerializeField]
+    private SimpleInteractionType interactionType =
+        SimpleInteractionType.ShowText;
 
     [Header("UI Text")]
     [TextArea]
@@ -24,13 +28,7 @@ public class SimpleInteractable2D : Interactable2D
     [Header("Pickup Settings")]
     [SerializeField] private string itemId = string.Empty; // e.g. "staff_keycard", "photo"
 
-    [Tooltip("Mark that the player has the staff keycard in the level game manager.")]
-    [SerializeField] private bool giveKeycardFlag = false;
-
-    [Tooltip("Mark that the player has the photo in the level game manager.")]
-    [SerializeField] private bool givePhotoFlag = false;
-
-    [Header("Behaviour")]
+    [Header("General Behaviour")]
     [SerializeField] private bool destroyAfterInteract = false;
 
     [Tooltip("If false, interaction will only work once.")]
@@ -38,7 +36,6 @@ public class SimpleInteractable2D : Interactable2D
 
     [Header("Remove Object Settings")]
     [SerializeField] private GameObject objectToRemove;
-
     [Tooltip("If true, will just deactivate the object instead of destroying it.")]
     [SerializeField] private bool deactivateInsteadOfDestroy = false;
 
@@ -62,24 +59,6 @@ public class SimpleInteractable2D : Interactable2D
         {
             Destroy(gameObject);
         }
-    }
-
-    private void RemoveObject()
-    {
-        // אם לא הוגדר אובייקט, נשתמש בעצמנו
-        GameObject target = objectToRemove != null ? objectToRemove : gameObject;
-
-        if (deactivateInsteadOfDestroy)
-        {
-            target.SetActive(false);
-        }
-        else
-        {
-            Destroy(target);
-        }
-
-        // אפשר גם להציג טקסט אם הוגדר
-        ShowInfoText();
     }
 
     private void HandleInteraction(PlayerInteraction2D player)
@@ -110,17 +89,32 @@ public class SimpleInteractable2D : Interactable2D
 
     private void PickupItem(PlayerInteraction2D player)
     {
-        // נסה למצוא את קומפוננטת האינבנטורי על השחקן
-        PlayerInventory inventory = player.GetComponent<PlayerInventory>();
+        var inventory = player.GetComponent<PlayerInventory>();
 
-        // Add to inventory if we have an id and an inventory component
-        if (!string.IsNullOrWhiteSpace(itemId) && inventory != null)
+        if (inventory != null && !string.IsNullOrWhiteSpace(itemId))
         {
             inventory.AddItem(itemId);
         }
 
-        
-        // Show feedback text
+        ShowInfoText();
+    }
+
+    private void RemoveObject()
+    {
+        // If no explicit target is set, act on this game object.
+        GameObject target = objectToRemove != null ? objectToRemove : gameObject;
+
+        if (deactivateInsteadOfDestroy)
+        {
+            target.SetActive(false);
+        }
+        else
+        {
+            // because this script inherits from MonoBehaviour,
+            // we can call Destroy() directly
+            Destroy(target);
+        }
+
         ShowInfoText();
     }
 }

@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Simple zombie enemy: if the player touches its collider, the player loses
-/// and a Game Over screen is shown.
+/// Simple zombie enemy: if the player touches its collider,
+/// the player loses and a Game Over screen is shown.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
@@ -14,24 +14,24 @@ public class ZombieKillPlayer2D : MonoBehaviour
 
     private void Awake()
     {
-        // חשוב: הקוליידר *לא* טריגר, כדי שהזומבי ייתקע בקירות
+        // The collider must NOT be a trigger so the zombie collides with walls.
         var col = GetComponent<Collider2D>();
         col.isTrigger = false;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // נבדוק אם שחקן נכנס בהתנגשות
+        // Check if the player entered the collision
         var playerMovement = collision.gameObject.GetComponent<PlayerMovement2D>();
         if (playerMovement == null)
         {
             return;
         }
 
-        // מכבים שליטה בשחקן
+        // Disable player movement
         playerMovement.enabled = false;
 
-        // מציגים מסך Game Over
+        // Show Game Over screen
         UIManager.Instance?.ShowGameOver(gameOverMessage);
     }
 }

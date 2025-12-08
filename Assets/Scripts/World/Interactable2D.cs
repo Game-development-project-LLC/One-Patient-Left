@@ -1,15 +1,22 @@
 using UnityEngine;
 
 /// <summary>
-/// Base class for any object the player can interact with using the E key.
+/// Base class for any object the player can interact with using the interaction key.
 /// </summary>
 public abstract class Interactable2D : MonoBehaviour
 {
+    [Header("Prompt")]
     [TextArea]
-    public string promptText = "Press E to interact";
+    [SerializeField]
+    private string promptText = "Press E to interact";
 
     /// <summary>
-    /// Called by PlayerInteraction2D when the player presses E near this object.
+    /// Text shown near the player when they can interact with this object.
+    /// </summary>
+    public string PromptText => promptText;
+
+    /// <summary>
+    /// Called by PlayerInteraction2D when the player presses the interaction key.
     /// </summary>
     public abstract void Interact(PlayerInteraction2D player);
 }
