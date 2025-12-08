@@ -1,43 +1,76 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-/// <summary>
-/// Simple top-down movement using WASD / Arrow keys.
-/// Press Z to toggle slow walking on/off.
-/// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement2D : MonoBehaviour
 {
     [Header("Movement Speeds")]
-    public float normalMoveSpeed = 4f;
-    public float slowMoveSpeed = 2f;
+    [SerializeField] private float normalSpeed = 4f;
+    [SerializeField] private float slowSpeed = 2f;
+
+    [Header("Input Settings")]
+    [SerializeField] private string horizontalAxisName = "Horizontal";
+    [SerializeField] private string verticalAxisName = "Vertical";
+    [SerializeField] private KeyCode slowToggleKey = KeyCode.Z; // כפתור להחלפת מהירות
 
     private Rigidbody2D rb;
-    private Vector2 movementInput;
-    private bool isSlowMode = false;   // if true -> use slowMoveSpeed
+    private Vector2 inputDirection = Vector2.zero;
+    private bool useSlowSpeed = false;
+    private float currentSpeed;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        currentSpeed = normalSpeed;
     }
 
     private void Update()
     {
-        // Movement input
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveY = Input.GetAxisRaw("Vertical");
-        movementInput = new Vector2(moveX, moveY).normalized;
-
-        // Toggle slow walk with Z
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            isSlowMode = !isSlowMode;
-            Debug.Log("Slow walk mode: " + (isSlowMode ? "ON" : "OFF"));
-        }
+        ReadMovementInput();
+        HandleSpeedToggle();
     }
 
     private void FixedUpdate()
     {
-        float currentSpeed = isSlowMode ? slowMoveSpeed : normalMoveSpeed;
-        rb.MovePosition(rb.position + movementInput * currentSpeed * Time.fixedDeltaTime);
+        MoveCharacter();
     }
+
+    private void ReadMovementInput()
+    {
+        float horizontal = Input.GetAxisRaw(horizontalAxisName);
+        float vertical = Input.GetAxisRaw(verticalAxisName);
+
+        inputDirection = new Vector2(horizontal, vertical).normalized;
+    }
+
+    private void HandleSpeedToggle()
+    {
+        if (Input.GetKeyDown(slowToggleKey))
+        {
+            useSlowSpeed = !useSlowSpeed;
+        }
+
+        currentSpeed = useSlowSpeed ? slowSpeed : normalSpeed;
+    }
+
+    private void MoveCharacter()
+    {
+        Vector2 targetPosition =
+            rb.position + inputDirection * currentSpeed * Time.fixedDeltaTime;
+
+        rb.MovePosition(targetPosition);
+    }
+
+    public float getNormalSpeed()
+    {
+        return normalSpeed;
+    }
+
+    public float getSlowSpeed()
+    {
+        return slowSpeed;
+    }
+
+
+    public bool IsUsingSlowSpeed => useSlowSpeed;
+    public float CurrentSpeed => currentSpeed;
 }

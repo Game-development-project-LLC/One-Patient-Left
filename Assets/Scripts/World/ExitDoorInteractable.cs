@@ -2,18 +2,27 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Exit door of the ward. Requires a keycard to open.
+/// Exit door of the ward. Requires a specific inventory item (e.g. staff keycard) to open.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class ExitDoorInteractable : Interactable2D
 {
+    [Header("Messages")]
     [TextArea]
-    public string lockedMessage = "The door is locked. You need a staff keycard.";
-    [TextArea]
-    public string openMessage = "You swipe the keycard. The door unlocks.";
+    [SerializeField]
+    private string lockedMessage =
+        "The door is locked. You need a staff keycard.";
 
-    // Optional: name of the next scene to load when exiting
-    public string nextSceneName = "";
+    [TextArea]
+    [SerializeField]
+    private string openMessage =
+        "You swipe the keycard. The door unlocks.";
+
+    [Header("Requirements")]
+    [SerializeField] private string requiredItemId = "staff_keycard";
+
+    [Header("Scene Transition")]
+    [SerializeField] private string nextSceneName = string.Empty;
 
     private void Awake()
     {
@@ -23,13 +32,14 @@ public class ExitDoorInteractable : Interactable2D
 
     public override void Interact(PlayerInteraction2D player)
     {
-        var inventory = player.GetComponent<PlayerInventory>();
+        PlayerInventory inventory = player.GetComponent<PlayerInventory>();
 
-        bool hasKey =
-            (inventory != null && inventory.HasItem("staff_keycard"))
-            || (Level1GameManager.Instance != null && Level1GameManager.Instance.HasKeycard);
+        bool hasRequiredItem =
+            inventory != null &&
+            !string.IsNullOrWhiteSpace(requiredItemId) &&
+            inventory.HasItem(requiredItemId);
 
-        if (!hasKey)
+        if (!hasRequiredItem)
         {
             UIManager.Instance?.ShowInfo(lockedMessage);
             return;
