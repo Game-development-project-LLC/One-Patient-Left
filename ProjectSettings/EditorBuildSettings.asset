@@ -8,21 +8,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/levels/Level_1.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
-<<<<<<< HEAD
-  - enabled: 1
-    path: Assets/Scenes/levels/Level_2.unity
-    guid: 4242a23a55afa0e45905c1bf040cb4fb
-=======
-  - enabled: 0
-    path: Assets/Scenes/levels/Level_2.unity
-    guid: 4242a23a55afa0e45905c1bf040cb4fb
   - enabled: 1
     path: Assets/Scenes/levels/L2_EmergencyExit_HospitalMain.unity
     guid: 14d49f4ef86725c4da694e6d1bb4a13e
   - enabled: 1
     path: Assets/Scenes/levels/L3_QuietStreet.unity
     guid: c3d89293a811ea04abc4e46fad8c9c40
->>>>>>> 5c80b9f (Finish Level 2: layout, colliders, puzzle and enemies)
-  m_configObjects:
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

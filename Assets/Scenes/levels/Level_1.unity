@@ -4262,7 +4262,8 @@ MonoBehaviour:
   lockedMessage: The door is locked. You need a staff keycard.
   openMessage: You swipe the keycard. The door unlocks.
   requiredItemId: staff_keycard
-  nextSceneName: Level_2
+  nextSceneName: L2_EmergencyExit_HospitalMain
+  isUnlocked: 1
 --- !u!61 &1881737200
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -1358,9 +1358,9 @@ MonoBehaviour:
   promptText: Press E to interact
   lockedMessage: Emergency exit is locked. Power is offline.
   openMessage: Emergency exit unlocked.
-  requiredItemId: staff_keycard
+  requiredItemId: 
   nextSceneName: L3_QuietStreet
-  unlocked: 0
+  isUnlocked: 0
 --- !u!61 &318634624
 BoxCollider2D:
   m_ObjectHideFlags: 0

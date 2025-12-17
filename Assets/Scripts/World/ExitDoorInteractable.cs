@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Exit door of the ward. Requires a specific inventory item to open
-/// (for example a staff keycard).
+/// Exit door of the ward. Can be unlocked by a system (e.g., a switch puzzle),
+/// and may optionally require an inventory item (e.g., a staff keycard).
+/// If requiredItemId is empty, no item is required.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class ExitDoorInteractable : Interactable2D
@@ -25,6 +26,14 @@ public class ExitDoorInteractable : Interactable2D
     [Header("Scene Transition")]
     [SerializeField] private string nextSceneName = string.Empty;
 
+    [SerializeField] private bool isUnlocked = false;
+
+    // Called by puzzles/systems to unlock the door.
+    public void SetUnlocked(bool unlocked)
+    {
+        isUnlocked = unlocked;
+    }
+
     private void Awake()
     {
         var col = GetComponent<Collider2D>();
@@ -33,17 +42,26 @@ public class ExitDoorInteractable : Interactable2D
 
     public override void Interact(PlayerInteraction2D player)
     {
-        var inventory = player.GetComponent<PlayerInventory>();
-
-        bool hasRequiredItem =
-            inventory != null &&
-            !string.IsNullOrWhiteSpace(requiredItemId) &&
-            inventory.HasItem(requiredItemId);
-
-        if (!hasRequiredItem)
+        // First gate: must be unlocked by switch/puzzle/system.
+        if (!isUnlocked)
         {
-            UIManager.Instance?.ShowInfo(lockedMessage);
+            // English message: door is still locked by power/system.
+            UIManager.Instance?.ShowInfo("The exit is locked.");
             return;
+        }
+
+        // Second gate (optional): require an item ONLY if requiredItemId is set.
+        bool requiresItem = !string.IsNullOrWhiteSpace(requiredItemId);
+        if (requiresItem)
+        {
+            var inventory = player.GetComponent<PlayerInventory>();
+            bool hasRequiredItem = inventory != null && inventory.HasItem(requiredItemId);
+
+            if (!hasRequiredItem)
+            {
+                UIManager.Instance?.ShowInfo(lockedMessage);
+                return;
+            }
         }
 
         UIManager.Instance?.ShowInfo(openMessage);
