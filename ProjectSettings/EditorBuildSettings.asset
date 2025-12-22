@@ -17,5 +17,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/levels/3/level_3_FireStation.unity
     guid: a50c097b7d897c94ba5ce42c4a64ad76
+  - enabled: 1
+    path: Assets/Scenes/levels/3/level_3_2.unity
+    guid: 6d62884e66c92b84580ded2acfbea410
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
