@@ -9,7 +9,10 @@ EditorBuildSettings:
     path: Assets/Scenes/levels/Level_1.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
-    path: Assets/Scenes/levels/L2_EmergencyExit_HospitalMain.unity
+    path: Assets/Scenes/levels/2/Level2_SpatialRebuild.unity
+    guid: e2743f28d0c14ac489a31206cb337149
+  - enabled: 0
+    path: Assets/Scenes/levels/2/L2_EmergencyExit_HospitalMain.unity
     guid: 14d49f4ef86725c4da694e6d1bb4a13e
   - enabled: 1
     path: Assets/Scenes/levels/3/level_3.unity

@@ -38,19 +38,19 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Ground
+  - name: Floor
     uniqueID: 3096164453
     locked: 0
-  - name: GroundDecals
+  - name: Walls
     uniqueID: 4107461495
     locked: 0
   - name: Props
     uniqueID: 2903499241
     locked: 0
-  - name: Characters
+  - name: Entities
     uniqueID: 3389525707
     locked: 0
-  - name: Foreground
+  - name: UI
     uniqueID: 677928657
     locked: 0
   - name: Default
