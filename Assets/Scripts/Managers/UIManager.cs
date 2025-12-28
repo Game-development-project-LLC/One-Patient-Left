@@ -1,5 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Simple UI manager for prompt/info/game over.
@@ -7,6 +8,9 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
+
+    [Header("Behavior")]
+    [SerializeField] private bool persistAcrossScenes = false;
 
     [Header("UI References")]
     [SerializeField] private TMP_Text promptText;
@@ -25,7 +29,11 @@ public class UIManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+
+        if (persistAcrossScenes)
+        {
+            DontDestroyOnLoad(gameObject);
+        }
 
         HidePrompt();
         HideInfo();
@@ -82,5 +90,34 @@ public class UIManager : MonoBehaviour
     public void HideGameOver()
     {
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
+    }
+
+    // ---------------- Buttons ----------------
+
+    /// <summary>
+    /// Called by the Restart button.
+    /// Reloads the active scene and resets time scale.
+    /// </summary>
+    public void RestartLevel()
+    {
+        Time.timeScale = 1f;
+        HidePrompt();
+        HideInfo();
+        HideGameOver();
+
+        Scene current = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(current.buildIndex);
+    }
+
+    /// <summary>
+    /// Optional: quit play mode or application.
+    /// </summary>
+    public void QuitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }

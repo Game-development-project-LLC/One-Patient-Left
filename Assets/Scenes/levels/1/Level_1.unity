@@ -1033,7 +1033,7 @@ GameObject:
   - component: {fileID: 237746536}
   - component: {fileID: 237746541}
   - component: {fileID: 237746540}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Zombie_2 (slow)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1189,10 +1189,10 @@ MonoBehaviour:
   returnSpeed: 1.4
   detectionRange: 2.5
   chaseSpeed: 2.2
-  loseRangeMultiplier: 1.2
+  loseRangeMultiplier: 2
   playerLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 9
   playerTag: Player
 --- !u!50 &237746541
 Rigidbody2D:
@@ -1265,10 +1265,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc320a7590ab006409fc33607683cb56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  persistAcrossScenes: 0
   promptText: {fileID: 405975097}
   infoText: {fileID: 1965346278}
   gameOverPanel: {fileID: 196835013}
-  gameOverText: {fileID: 0}
+  gameOverText: {fileID: 1199784342}
 --- !u!1 &274013961
 GameObject:
   m_ObjectHideFlags: 0
@@ -3724,7 +3725,7 @@ GameObject:
   - component: {fileID: 932308363}
   - component: {fileID: 932308364}
   - component: {fileID: 932308365}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -6424,7 +6425,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 258433222}
-        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: UIManager, GameRuntime
         m_MethodName: RestartLevel
         m_Mode: 1
         m_Arguments:
@@ -7630,7 +7631,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

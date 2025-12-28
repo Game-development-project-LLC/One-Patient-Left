@@ -14,12 +14,22 @@ public sealed class ZombieChasePlayer2D : MonoBehaviour
     [SerializeField] private float detectionRange = 2.5f;
     [SerializeField] private float chaseSpeed = 2.2f;
     [SerializeField] private float loseRangeMultiplier = 1.2f;
-    [SerializeField] private LayerMask playerLayer;
+
+    [Tooltip("Which layers can be detected as the player. Set to Everything if unsure.")]
+    [SerializeField] private LayerMask playerLayer = ~0;
+
     [SerializeField] private string playerTag = "Player";
+
+    [Tooltip("If the player's collider is Trigger, enable this so the zombie can still detect them.")]
+    [SerializeField] private bool detectTriggerColliders = true;
 
     private Rigidbody2D rb;
     private Transform playerTarget;
     private Vector2 homePos;
+
+    // Non-alloc buffer to avoid GC
+    private readonly Collider2D[] hits = new Collider2D[16];
+    private ContactFilter2D filter;
 
     private void Awake()
     {
@@ -28,6 +38,16 @@ public sealed class ZombieChasePlayer2D : MonoBehaviour
         rb.freezeRotation = true;
 
         homePos = rb.position;
+
+        // Build filter (fallback to Everything if mask is "Nothing")
+        LayerMask maskToUse = (playerLayer.value == 0) ? (LayerMask)~0 : playerLayer;
+
+        filter = new ContactFilter2D
+        {
+            useLayerMask = true,
+            layerMask = maskToUse,
+            useTriggers = detectTriggerColliders
+        };
     }
 
     private void FixedUpdate()
@@ -46,6 +66,7 @@ public sealed class ZombieChasePlayer2D : MonoBehaviour
 
     private void UpdateTarget()
     {
+        // Keep current target if still valid
         if (playerTarget != null)
         {
             if (IsPlayerHidden(playerTarget))
@@ -55,20 +76,38 @@ public sealed class ZombieChasePlayer2D : MonoBehaviour
             }
 
             float maxDist = detectionRange * loseRangeMultiplier;
-            if (Vector2.Distance(transform.position, playerTarget.position) > maxDist)
+            if (Vector2.Distance(rb.position, (Vector2)playerTarget.position) > maxDist)
                 playerTarget = null;
 
             return;
         }
 
-        Collider2D hit = Physics2D.OverlapCircle(transform.position, detectionRange, playerLayer);
-        if (hit == null) return;
-        if (!hit.CompareTag(playerTag)) return;
+        // Acquire new target
+        int count = Physics2D.OverlapCircle(rb.position, detectionRange, filter, hits);
+        if (count <= 0) return;
 
-        Transform candidate = hit.transform;
-        if (IsPlayerHidden(candidate)) return;
+        Transform best = null;
+        float bestSqr = float.PositiveInfinity;
 
-        playerTarget = candidate;
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D c = hits[i];
+            if (c == null) continue;
+            if (!c.CompareTag(playerTag)) continue;
+
+            Transform candidate = c.transform;
+
+            if (IsPlayerHidden(candidate)) continue;
+
+            float sqr = ((Vector2)candidate.position - rb.position).sqrMagnitude;
+            if (sqr < bestSqr)
+            {
+                bestSqr = sqr;
+                best = candidate;
+            }
+        }
+
+        playerTarget = best;
     }
 
     private bool IsPlayerHidden(Transform player)
