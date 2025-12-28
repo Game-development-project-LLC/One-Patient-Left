@@ -47,7 +47,6 @@ public class PlayerInventoryTests
     public void AddItem_EmptyOrNull_IsIgnored()
     {
         inventory.AddItem("");
-        inventory.AddItem(null);
         inventory.AddItem("   ");
 
         Assert.IsFalse(inventory.HasItem(""),

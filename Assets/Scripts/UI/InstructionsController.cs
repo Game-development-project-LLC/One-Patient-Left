@@ -1,82 +1,117 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-/// <summary>
-/// Shows an instructions panel at the start of the level,
-/// and lets the player toggle it with a key.
-/// </summary>
 public class InstructionsController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GameObject instructionsPanel;
-    [SerializeField] private PlayerMovement2D playerMovement;
+
+    [Header("Input (New Input System)")]
+    [SerializeField] private InputActionReference toggleInstructionsAction;
 
     [Header("Behaviour")]
     [SerializeField] private bool showOnStart = true;
 
-    [Tooltip("Keyboard key to toggle the instructions panel.")]
-    [SerializeField] private KeyCode toggleKey = KeyCode.H;
+    [Header("Player Lock")]
+    [Tooltip("Tag used to find the player GameObject.")]
+    [SerializeField] private string playerTag = "Player";
 
     private bool isVisible;
+    private MonoBehaviour[] cachedPlayerBehaviours;
 
-    private void Start()
+    private void OnEnable()
     {
-        if (instructionsPanel == null)
+        if (toggleInstructionsAction != null)
         {
-            return;
-        }
-
-        if (showOnStart)
-        {
-            ShowInstructions();
-        }
-        else
-        {
-            instructionsPanel.SetActive(false);
-            isVisible = false;
+            toggleInstructionsAction.action.Enable();
+            toggleInstructionsAction.action.performed += OnTogglePerformed;
         }
     }
 
-    private void Update()
+    private void OnDisable()
     {
-        if (instructionsPanel == null)
+        if (toggleInstructionsAction != null)
         {
+            toggleInstructionsAction.action.performed -= OnTogglePerformed;
+            toggleInstructionsAction.action.Disable();
+        }
+    }
+
+    private void Start()
+    {
+        CachePlayerBehaviours();
+
+        if (showOnStart) ShowInstructions();
+        else HideInstructions();
+    }
+
+    private void CachePlayerBehaviours()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag(playerTag);
+        if (player == null)
+        {
+            Debug.LogWarning($"InstructionsController: No GameObject with tag '{playerTag}' found.");
+            cachedPlayerBehaviours = null;
             return;
         }
 
-        if (Input.GetKeyDown(toggleKey))
-        {
-            if (isVisible)
-            {
-                HideInstructions();
-            }
-            else
-            {
-                ShowInstructions();
-            }
-        }
+        // Disable/enable all scripts on the player EXCEPT inventory/UI/etc.
+        cachedPlayerBehaviours = player.GetComponents<MonoBehaviour>();
+    }
+
+    private void OnTogglePerformed(InputAction.CallbackContext ctx)
+    {
+        Debug.Log("ToggleInstructions pressed");
+        if (instructionsPanel == null)
+            return;
+
+        if (isVisible) HideInstructions();
+        else ShowInstructions();
     }
 
     public void ShowInstructions()
     {
-        instructionsPanel.SetActive(true);
+        if (instructionsPanel != null)
+            instructionsPanel.SetActive(true);
+
         isVisible = true;
 
-        // Disable player movement while reading instructions
-        if (playerMovement != null)
-        {
-            playerMovement.enabled = false;
-        }
+        UIManager.Instance?.HidePrompt();
+
+        SetPlayerInputEnabled(false);
     }
 
     public void HideInstructions()
     {
-        instructionsPanel.SetActive(false);
+        if (instructionsPanel != null)
+            instructionsPanel.SetActive(false);
+
         isVisible = false;
 
-        // Re-enable player movement
-        if (playerMovement != null)
+        UIManager.Instance?.ClearInfo();
+
+        SetPlayerInputEnabled(true);
+    }
+
+    private void SetPlayerInputEnabled(bool enabled)
+    {
+        if (cachedPlayerBehaviours == null || cachedPlayerBehaviours.Length == 0)
+            CachePlayerBehaviours();
+
+        if (cachedPlayerBehaviours == null)
+            return;
+
+        foreach (MonoBehaviour b in cachedPlayerBehaviours)
         {
-            playerMovement.enabled = true;
+            if (b == null) continue;
+
+            // Whitelist: do NOT disable UI / Inventory / Interaction controller if you still want them
+            // while instructions are open. If you want to freeze everything, remove this block.
+            if (b is PlayerMovement) { b.enabled = enabled; continue; }
+            if (b is PlayerInteraction) { b.enabled = enabled; continue; }
+
+            // Add more scripts here if needed:
+            // if (b is PlayerInventory) { b.enabled = enabled; continue; }
         }
     }
 }

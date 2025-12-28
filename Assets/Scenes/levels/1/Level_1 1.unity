@@ -302,13 +302,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
   promptText: Press E to interact
-  interactionType: 2
-  infoText: "The wall collapsed upon touch.. \nHow long have I been here?"
+  itemToPickup: {fileID: 0}
   itemId: 
-  destroyAfterInteract: 1
-  canInteractMultipleTimes: 0
-  objectToRemove: {fileID: 1323820003}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessagePrefix: 'Picked up: '
 --- !u!61 &167674519
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -385,6 +382,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 258433221}
+  - {fileID: 400854755}
+  - {fileID: 1593378794}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &191973047
@@ -397,6 +396,7 @@ GameObject:
   m_Component:
   - component: {fileID: 191973048}
   - component: {fileID: 191973049}
+  - component: {fileID: 191973050}
   m_Layer: 0
   m_Name: room_iv_stand_w_0
   m_TagString: Untagged
@@ -477,6 +477,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!61 &191973050
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191973047}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.16, y: 0.3}
+    newSize: {x: 0.16, y: 0.3}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.16, y: 0.3}
+  m_EdgeRadius: 0
 --- !u!1 &193076252
 GameObject:
   m_ObjectHideFlags: 0
@@ -489,7 +535,7 @@ GameObject:
   - component: {fileID: 193076255}
   - component: {fileID: 193076254}
   m_Layer: 0
-  m_Name: PhotoCircle (1)
+  m_Name: desk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -504,11 +550,11 @@ Transform:
   m_GameObject: {fileID: 193076252}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.08, y: -2.48, z: 0}
+  m_LocalPosition: {x: -6.8984203, y: -2.9723701, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 632054141}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &193076254
 BoxCollider2D:
@@ -540,7 +586,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -858,7 +904,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -1102,7 +1148,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b26c7c7bb669734aaf8510a688ae11c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieKillPlayer2D
-  gameOverMessage: The zombie caught you.
+  playerTag: Player
+  destroyOnKill: 1
+  disableRootOnKill: {fileID: 0}
 --- !u!61 &237746537
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1234,11 +1282,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74705525232806468c418246e6ff915, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieChasePlayer2D
-  moveSpeed: 2
-  matchPlayerSpeed: 1
-  detectionRadius: 3
-  loseRadius: 7
-  playerTransform: {fileID: 932308357}
+  returnSpeed: 1.4
+  detectionRange: 2.5
+  chaseSpeed: 2.2
+  loseRangeMultiplier: 1.2
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  playerTag: Player
 --- !u!50 &237746541
 Rigidbody2D:
   serializedVersion: 5
@@ -1313,7 +1364,7 @@ MonoBehaviour:
   promptText: {fileID: 405975097}
   infoText: {fileID: 1965346278}
   gameOverPanel: {fileID: 196835013}
-  gameOverText: {fileID: 1199784342}
+  gameOverText: {fileID: 0}
 --- !u!1 &274013961
 GameObject:
   m_ObjectHideFlags: 0
@@ -1326,6 +1377,7 @@ GameObject:
   - component: {fileID: 274013964}
   - component: {fileID: 274013963}
   - component: {fileID: 274013965}
+  - component: {fileID: 274013966}
   m_Layer: 0
   m_Name: Clue- Hospital
   m_TagString: Untagged
@@ -1342,11 +1394,11 @@ Transform:
   m_GameObject: {fileID: 274013961}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.26, y: -4.02, z: 0}
+  m_LocalPosition: {x: -6.30587, y: -3.8894799, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1535456954}
+  m_Father: {fileID: 1204105779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &274013963
 MonoBehaviour:
@@ -1361,16 +1413,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
   promptText: Press E to interact
-  interactionType: 0
-  infoText: 'How did I get to this Hospital?
-
-    I see items on the floor.. Maybe
-    one of them can shed some light.'
+  itemToPickup: {fileID: 0}
   itemId: 
-  destroyAfterInteract: 1
-  canInteractMultipleTimes: 0
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessagePrefix: 'Picked up: '
 --- !u!212 &274013964
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1475,6 +1521,24 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.64, y: 0.64}
   m_EdgeRadius: 0
+--- !u!114 &274013966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 274013961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f7e30e6145b0f94fbf444fc1644af42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::TextOnInteract
+  promptTemplate: Press {key} to interact
+  message: this creatue.. I think it cant see me from here. maybe it has a limited
+    range of sight?
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &294571415
 GameObject:
   m_ObjectHideFlags: 0
@@ -1558,12 +1622,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 294571415}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.131, y: -0.366, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.4500902, y: -0.74498, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &304269384
 GameObject:
@@ -1611,13 +1675,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
   promptText: Press E to interact
-  interactionType: 2
-  infoText: "The wall collapsed upon touch.. \nHow long have I been here?"
+  itemToPickup: {fileID: 0}
   itemId: 
-  destroyAfterInteract: 1
-  canInteractMultipleTimes: 0
-  objectToRemove: {fileID: 1532762507}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessagePrefix: 'Picked up: '
 --- !u!61 &304269387
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1674,6 +1735,7 @@ GameObject:
   m_Component:
   - component: {fileID: 306440545}
   - component: {fileID: 306440544}
+  - component: {fileID: 306440546}
   m_Layer: 0
   m_Name: Container_12_Green_Horizontal_Overgrown_Green_0
   m_TagString: Untagged
@@ -1747,13 +1809,59 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 306440543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.803, y: 4.4977603, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -6.4839096, y: 4.1187806, z: 0}
   m_LocalScale: {x: 2, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &306440546
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 306440543}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.41, y: 0.29}
+    newSize: {x: 0.41, y: 0.29}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.41, y: 0.29}
+  m_EdgeRadius: 0
 --- !u!1 &371387301
 GameObject:
   m_ObjectHideFlags: 0
@@ -1973,12 +2081,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 376913476}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.120603, y: -0.12958074, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.4396932, y: -0.5085608, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &400854752
 GameObject:
@@ -2052,12 +2160,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400854752}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 7.71692, y: -2.11866, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 184344816}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &405975094
 GameObject:
@@ -2841,16 +2949,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 632054140}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.13751, y: -0.11339, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.86429, y: -0.36185, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2000619651}
-  - {fileID: 193076253}
   - {fileID: 1312274453}
-  - {fileID: 784184712}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1727240981}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &649419141
 GameObject:
@@ -2862,7 +2968,6 @@ GameObject:
   m_Component:
   - component: {fileID: 649419142}
   - component: {fileID: 649419145}
-  - component: {fileID: 649419144}
   - component: {fileID: 649419143}
   m_Layer: 0
   m_Name: bed_3
@@ -2916,7 +3021,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -2930,30 +3035,8 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.5, y: 0.5}
+  m_Size: {x: 0.2, y: 0.3}
   m_EdgeRadius: 0
---- !u!114 &649419144
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 649419141}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46d4e5511d87fae418ac98b76d4945ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
-  promptText: Press E to interact
-  interactionType: 0
-  infoText: 'This place.. hospital?
-
-    why am I here? and why is it so quiet?'
-  itemId: 
-  destroyAfterInteract: 0
-  canInteractMultipleTimes: 1
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
 --- !u!212 &649419145
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3022,7 +3105,6 @@ GameObject:
   m_Component:
   - component: {fileID: 693390141}
   - component: {fileID: 693390144}
-  - component: {fileID: 693390143}
   - component: {fileID: 693390142}
   m_Layer: 0
   m_Name: bed_4 (1)
@@ -3076,7 +3158,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -3092,26 +3174,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5, y: 0.5}
   m_EdgeRadius: 0
---- !u!114 &693390143
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 693390140}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46d4e5511d87fae418ac98b76d4945ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
-  promptText: Press E to interact
-  interactionType: 0
-  infoText: I don't have time to rest. I need to get out of this room
-  itemId: 
-  destroyAfterInteract: 0
-  canInteractMultipleTimes: 1
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
 --- !u!212 &693390144
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3180,6 +3242,7 @@ GameObject:
   m_Component:
   - component: {fileID: 709962060}
   - component: {fileID: 709962059}
+  - component: {fileID: 709962061}
   m_Layer: 0
   m_Name: Garbage-Bin_4_0
   m_TagString: Untagged
@@ -3253,13 +3316,59 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 709962058}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.938, y: -0.017, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 6.2570906, y: -0.39598, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &709962061
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709962058}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.16, y: 0.27}
+    newSize: {x: 0.16, y: 0.27}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.16, y: 0.27}
+  m_EdgeRadius: 0
 --- !u!1 &784184711
 GameObject:
   m_ObjectHideFlags: 0
@@ -3287,11 +3396,11 @@ Transform:
   m_GameObject: {fileID: 784184711}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.2, y: 4.04, z: 0}
+  m_LocalPosition: {x: 0.3815801, y: 3.5476298, z: 0}
   m_LocalScale: {x: 6, y: 6, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 632054141}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &784184713
 BoxCollider2D:
@@ -3407,6 +3516,7 @@ GameObject:
   m_Component:
   - component: {fileID: 806353385}
   - component: {fileID: 806353386}
+  - component: {fileID: 806353387}
   m_Layer: 0
   m_Name: lab_large_table_0
   m_TagString: Untagged
@@ -3423,7 +3533,7 @@ Transform:
   m_GameObject: {fileID: 806353384}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.9790897, y: 1.4975741, z: 0}
+  m_LocalPosition: {x: 7.72, y: 1.4975741, z: 0}
   m_LocalScale: {x: 3, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3487,6 +3597,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!61 &806353387
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 806353384}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.64, y: 0.25}
+    newSize: {x: 0.64, y: 0.25}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.64, y: 0.25}
+  m_EdgeRadius: 0
 --- !u!1 &813388217
 GameObject:
   m_ObjectHideFlags: 0
@@ -3533,13 +3689,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
   promptText: Press E to interact
-  interactionType: 2
-  infoText: "The wall collapsed upon touch.. \nHow long have I been here?"
+  itemToPickup: {fileID: 0}
   itemId: 
-  destroyAfterInteract: 1
-  canInteractMultipleTimes: 0
-  objectToRemove: {fileID: 1687177640}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessagePrefix: 'Picked up: '
 --- !u!61 &813388220
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3596,6 +3749,7 @@ GameObject:
   m_Component:
   - component: {fileID: 835343777}
   - component: {fileID: 835343778}
+  - component: {fileID: 835343779}
   m_Layer: 0
   m_Name: operation_ct_scanner_0 (1)
   m_TagString: Untagged
@@ -3676,6 +3830,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!61 &835343779
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 835343776}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.51, y: 0.71}
+    newSize: {x: 0.51, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.51, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &866726686
 GameObject:
   m_ObjectHideFlags: 0
@@ -3859,13 +4059,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
   promptText: Press E to interact
-  interactionType: 2
-  infoText: "The wall collapsed upon touch.. \nHow long have I been here?"
+  itemToPickup: {fileID: 0}
   itemId: 
-  destroyAfterInteract: 1
-  canInteractMultipleTimes: 0
-  objectToRemove: {fileID: 2049617374}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessagePrefix: 'Picked up: '
 --- !u!61 &905502829
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3924,12 +4121,14 @@ GameObject:
   - component: {fileID: 932308356}
   - component: {fileID: 932308355}
   - component: {fileID: 932308360}
-  - component: {fileID: 932308359}
   - component: {fileID: 932308358}
-  - component: {fileID: 932308361}
+  - component: {fileID: 932308362}
+  - component: {fileID: 932308363}
+  - component: {fileID: 932308364}
+  - component: {fileID: 932308365}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4046,24 +4245,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a546ca909373643499390cbb91a8d9f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction2D
-  interactKey: 101
---- !u!114 &932308359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 932308354}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4c3181ddb30ece4db995e7d0117a7d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement2D
-  normalSpeed: 4
-  slowSpeed: 2
-  horizontalAxisName: Horizontal
-  verticalAxisName: Vertical
-  slowToggleKey: 122
+  interactAction: {fileID: 8036144613833235207, guid: 8282c93044dd4bb4dad8ce5dcc6a5c19, type: 3}
+  interactKeyDisplay: E
+  moveHideThreshold: 0.001
 --- !u!58 &932308360
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -4100,7 +4284,23 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.1
---- !u!114 &932308361
+--- !u!114 &932308362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932308354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19a1618f2c2035841ab4070901b36498, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::PlayerMovement
+  normalSpeed: 4
+  slowSpeed: 2
+  moveAction: {fileID: -8813727712437673546, guid: 8282c93044dd4bb4dad8ce5dcc6a5c19, type: 3}
+  slowWalkAction: {fileID: 4629872609050830525, guid: 8282c93044dd4bb4dad8ce5dcc6a5c19, type: 3}
+--- !u!114 &932308363
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4111,8 +4311,39 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ed006e246095d4d4f96cb87371ec4f92, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerInventory
-  inventoryToggleKey: 105
+  m_EditorClassIdentifier: GameRuntime::PlayerInventory
+  toggleInventoryAction: {fileID: -3353884029086613660, guid: 8282c93044dd4bb4dad8ce5dcc6a5c19, type: 3}
+  itemDatabase: {fileID: 11400000, guid: a2c5976244303364e84e6578eeffa436, type: 2}
+  entries: []
+--- !u!114 &932308364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932308354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 641065bf7b17d454d9a15607437e89d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::PlayerStealthState
+  slowWalkAction: {fileID: 4629872609050830525, guid: 8282c93044dd4bb4dad8ce5dcc6a5c19, type: 3}
+--- !u!114 &932308365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932308354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78540e15844800e4989c5816a6eaea0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::PlayerOneHitDeath
+  gameOverPanel: {fileID: 196835013}
+  disableOnDeath:
+  - {fileID: 932308362}
+  - {fileID: 932308358}
 --- !u!1 &938947193
 GameObject:
   m_ObjectHideFlags: 0
@@ -4272,6 +4503,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1018945982}
   - component: {fileID: 1018945983}
+  - component: {fileID: 1018945984}
   m_Layer: 0
   m_Name: room_iv_stand_w_0 (1)
   m_TagString: Untagged
@@ -4352,6 +4584,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!61 &1018945984
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018945981}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.16, y: 0.3}
+    newSize: {x: 0.16, y: 0.3}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.16, y: 0.3}
+  m_EdgeRadius: 0
 --- !u!1 &1019900272
 GameObject:
   m_ObjectHideFlags: 0
@@ -4362,7 +4640,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1019900273}
   - component: {fileID: 1019900276}
-  - component: {fileID: 1019900275}
   - component: {fileID: 1019900274}
   m_Layer: 0
   m_Name: bed_2
@@ -4416,7 +4693,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -4432,26 +4709,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5, y: 0.5}
   m_EdgeRadius: 0
---- !u!114 &1019900275
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1019900272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46d4e5511d87fae418ac98b76d4945ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
-  promptText: Press E to interact
-  interactionType: 0
-  infoText: I don't have time to rest. I need to get out of this room
-  itemId: 
-  destroyAfterInteract: 0
-  canInteractMultipleTimes: 1
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
 --- !u!212 &1019900276
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4573,7 +4830,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -5063,7 +5320,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1202175332}
   - component: {fileID: 1202175334}
-  - component: {fileID: 1202175333}
   - component: {fileID: 1202175335}
   m_Layer: 0
   m_Name: bed_1
@@ -5087,28 +5343,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 430210540}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1202175333
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1202175331}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46d4e5511d87fae418ac98b76d4945ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
-  promptText: Press E to interact
-  interactionType: 0
-  infoText: 'This place.. hospital?
-
-    why am I here? and why is it so quiet?'
-  itemId: 
-  destroyAfterInteract: 0
-  canInteractMultipleTimes: 1
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
 --- !u!212 &1202175334
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5197,7 +5431,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -5211,8 +5445,46 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.5, y: 0.5}
+  m_Size: {x: 0.2, y: 0.3}
   m_EdgeRadius: 0
+--- !u!1 &1204105778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1204105779}
+  m_Layer: 0
+  m_Name: interact_objects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1204105779
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1204105778}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2098707169}
+  - {fileID: 1830204022}
+  - {fileID: 274013962}
+  - {fileID: 1943208317}
+  - {fileID: 1518504764}
+  - {fileID: 1881737202}
+  - {fileID: 2037699737}
+  m_Father: {fileID: 1727240981}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1218698195
 GameObject:
   m_ObjectHideFlags: 0
@@ -5223,6 +5495,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1218698196}
   - component: {fileID: 1218698197}
+  - component: {fileID: 1218698198}
   m_Layer: 1
   m_Name: lab_large_table_0 (1)
   m_TagString: Untagged
@@ -5303,6 +5576,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!61 &1218698198
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218698195}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.64, y: 0.25}
+    newSize: {x: 0.64, y: 0.25}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.64, y: 0.25}
+  m_EdgeRadius: 0
 --- !u!1 &1246788835
 GameObject:
   m_ObjectHideFlags: 0
@@ -5313,7 +5632,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1246788836}
   - component: {fileID: 1246788839}
-  - component: {fileID: 1246788838}
   - component: {fileID: 1246788837}
   m_Layer: 0
   m_Name: bed_2 (1)
@@ -5367,7 +5685,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -5383,26 +5701,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5, y: 0.5}
   m_EdgeRadius: 0
---- !u!114 &1246788838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1246788835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46d4e5511d87fae418ac98b76d4945ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
-  promptText: Press E to interact
-  interactionType: 0
-  infoText: I don't have time to rest. I need to get out of this room
-  itemId: 
-  destroyAfterInteract: 0
-  canInteractMultipleTimes: 1
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
 --- !u!212 &1246788839
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5490,10 +5788,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1881737202}
   - {fileID: 217651443}
   - {fileID: 1030320206}
-  - {fileID: 2037699737}
   m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1312274449
@@ -5508,6 +5804,7 @@ GameObject:
   - component: {fileID: 1312274452}
   - component: {fileID: 1312274451}
   - component: {fileID: 1312274454}
+  - component: {fileID: 1312274455}
   m_Layer: 0
   m_Name: Cabinet
   m_TagString: Untagged
@@ -5647,13 +5944,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
   promptText: Press E to interact
-  interactionType: 1
-  infoText: you found the key! now only if there was a way to get to the door..
+  itemToPickup: {fileID: 11400000, guid: 60bebdbebcd2f534c9a8719ce5e21d75, type: 2}
   itemId: staff_keycard
-  destroyAfterInteract: 1
-  canInteractMultipleTimes: 0
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessagePrefix: 'Picked up: key'
+--- !u!114 &1312274455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312274449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93ad70cfc51193843ac718848ddd000d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::PickupInteractable
+  promptTemplate: Press {key} to interact
+  itemId: StaffKeycard
+  amount: 1
+  pickupMessageTemplate: 'Picked up: {item}'
+  disableOnPickup: 1
 --- !u!1 &1323820003
 GameObject:
   m_ObjectHideFlags: 0
@@ -5802,6 +6113,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1406819368}
   - component: {fileID: 1406819369}
+  - component: {fileID: 1406819370}
   m_Layer: 0
   m_Name: lab_wooden_cabinet_0
   m_TagString: Untagged
@@ -5882,6 +6194,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!61 &1406819370
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1406819367}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.19, y: 0.29}
+    newSize: {x: 0.19, y: 0.29}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.19, y: 0.29}
+  m_EdgeRadius: 0
 --- !u!1 &1474598069
 GameObject:
   m_ObjectHideFlags: 0
@@ -5965,12 +6323,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1474598069}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.672, y: -0.12958074, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.99109, y: -0.5085608, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1483406499
 GameObject:
@@ -6187,13 +6545,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameRuntime::SimpleInteractable2D
   promptText: Press E to interact
-  interactionType: 0
-  infoText: 
+  itemToPickup: {fileID: 0}
   itemId: 
-  destroyAfterInteract: 0
-  canInteractMultipleTimes: 0
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessagePrefix: 'Picked up: '
 --- !u!212 &1518504763
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6260,12 +6615,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1518504760}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.389993, y: -0.258, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.663213, y: -0.50645995, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1204105779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1532762507
 GameObject:
@@ -6562,15 +6917,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1535456953}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.31909, y: 0.37898, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.0458701, y: 0.13052002, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2098707169}
-  - {fileID: 1830204022}
-  - {fileID: 274013962}
-  - {fileID: 1943208317}
   - {fileID: 1615106355}
   - {fileID: 1275975050}
   - {fileID: 430210540}
@@ -6581,7 +6932,20 @@ Transform:
   - {fileID: 1218698196}
   - {fileID: 191973048}
   - {fileID: 1018945982}
-  m_Father: {fileID: 0}
+  - {fileID: 306440545}
+  - {fileID: 1995038463}
+  - {fileID: 1699037445}
+  - {fileID: 376913478}
+  - {fileID: 1903343498}
+  - {fileID: 1952251004}
+  - {fileID: 1474598071}
+  - {fileID: 294571417}
+  - {fileID: 1595622921}
+  - {fileID: 709962060}
+  - {fileID: 1553156086}
+  - {fileID: 193076253}
+  - {fileID: 784184712}
+  m_Father: {fileID: 1727240981}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1553156084
 GameObject:
@@ -6593,6 +6957,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1553156086}
   - component: {fileID: 1553156085}
+  - component: {fileID: 1553156087}
   m_Layer: 0
   m_Name: Garbage-Bin_4_0 (1)
   m_TagString: Untagged
@@ -6666,13 +7031,59 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1553156084}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.938, y: -0.344, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 6.2570906, y: -0.72298, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &1553156087
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1553156084}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.16, y: 0.27}
+    newSize: {x: 0.16, y: 0.27}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.16, y: 0.27}
+  m_EdgeRadius: 0
 --- !u!1 &1593378792
 GameObject:
   m_ObjectHideFlags: 0
@@ -6703,9 +7114,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InstructionsController
   instructionsPanel: {fileID: 216893386}
-  playerMovement: {fileID: 932308359}
+  toggleInstructionsAction: {fileID: -7730685810771986863, guid: 8282c93044dd4bb4dad8ce5dcc6a5c19, type: 3}
   showOnStart: 1
-  toggleKey: 104
+  playerTag: Player
 --- !u!4 &1593378794
 Transform:
   m_ObjectHideFlags: 0
@@ -6714,12 +7125,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1593378792}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.13853, y: 1.49963, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 9.855439, y: -0.6190262, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 184344816}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1595622919
 GameObject:
@@ -6804,12 +7215,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1595622919}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.6205826, y: -0.3452952, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.9396727, y: -0.72427523, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1615106354
 GameObject:
@@ -7000,6 +7411,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1699037445}
   - component: {fileID: 1699037444}
+  - component: {fileID: 1699037446}
   m_Layer: 0
   m_Name: Reinforced_wooden-wall_Gate_Horizontal_0
   m_TagString: Untagged
@@ -7073,13 +7485,59 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1699037443}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.386, y: 4.405, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -7.06691, y: 4.0260205, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &1699037446
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1699037443}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.16, y: 0.15}
+    newSize: {x: 0.16, y: 0.15}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.16, y: 0.15}
+  m_EdgeRadius: 0
 --- !u!1 &1717251750
 GameObject:
   m_ObjectHideFlags: 0
@@ -7090,7 +7548,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1717251751}
   - component: {fileID: 1717251754}
-  - component: {fileID: 1717251753}
   - component: {fileID: 1717251752}
   m_Layer: 0
   m_Name: bed_4
@@ -7144,7 +7601,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -7160,26 +7617,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5, y: 0.5}
   m_EdgeRadius: 0
---- !u!114 &1717251753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1717251750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46d4e5511d87fae418ac98b76d4945ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
-  promptText: Press E to interact
-  interactionType: 0
-  infoText: I don't have time to rest. I need to get out of this room
-  itemId: 
-  destroyAfterInteract: 0
-  canInteractMultipleTimes: 1
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
 --- !u!212 &1717251754
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -7238,6 +7675,40 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1727240980
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1727240981}
+  m_Layer: 0
+  m_Name: Objects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1727240981
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1727240980}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.27322, y: 0.24846, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1535456954}
+  - {fileID: 632054141}
+  - {fileID: 1204105779}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1734438153
 GameObject:
   m_ObjectHideFlags: 0
@@ -7248,6 +7719,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1734438154}
   - component: {fileID: 1734438155}
+  - component: {fileID: 1734438156}
   m_Layer: 0
   m_Name: operation_ct_scanner_0
   m_TagString: Untagged
@@ -7328,6 +7800,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!61 &1734438156
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1734438153}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.51, y: 0.71}
+    newSize: {x: 0.51, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.51, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &1830204021
 GameObject:
   m_ObjectHideFlags: 0
@@ -7340,6 +7858,7 @@ GameObject:
   - component: {fileID: 1830204024}
   - component: {fileID: 1830204023}
   - component: {fileID: 1830204025}
+  - component: {fileID: 1830204026}
   m_Layer: 0
   m_Name: Clue-zombie agro
   m_TagString: Untagged
@@ -7355,12 +7874,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1830204021}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.86, y: -0.56, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.8141298, y: -0.42948, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1535456954}
+  m_Father: {fileID: 1204105779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1830204023
 MonoBehaviour:
@@ -7375,16 +7894,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
   promptText: Press E to interact
-  interactionType: 0
-  infoText: 'The creature does not seem to react yet..
-
-    I wonder, maybe it can''t
-    see me from here..'
+  itemToPickup: {fileID: 0}
   itemId: 
-  destroyAfterInteract: 1
-  canInteractMultipleTimes: 0
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessagePrefix: 'Picked up: '
 --- !u!212 &1830204024
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -7489,6 +8002,24 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.64, y: 0.64}
   m_EdgeRadius: 0
+--- !u!114 &1830204026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1830204021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f7e30e6145b0f94fbf444fc1644af42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::TextOnInteract
+  promptTemplate: Press {key} to interact
+  message: this pile looks like it might collapse any second.. maybe I can use it
+    to tale out this zombie.
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1881737198
 GameObject:
   m_ObjectHideFlags: 0
@@ -7500,7 +8031,7 @@ GameObject:
   - component: {fileID: 1881737202}
   - component: {fileID: 1881737201}
   - component: {fileID: 1881737200}
-  - component: {fileID: 1881737199}
+  - component: {fileID: 1881737203}
   m_Layer: 0
   m_Name: ExitDoor
   m_TagString: Untagged
@@ -7508,24 +8039,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1881737199
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1881737198}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad8c71da64e7fe341b8d945256e7d96b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ExitDoorInteractable
-  promptText: Press E to interact
-  lockedMessage: The door is locked. You need a staff keycard.
-  openMessage: You swipe the keycard. The door unlocks.
-  requiredItemId: staff_keycard
-  nextSceneName: L2_EmergencyExit_HospitalMain
-  isUnlocked: 1
 --- !u!61 &1881737200
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7639,12 +8152,29 @@ Transform:
   m_GameObject: {fileID: 1881737198}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.235, y: 4.336, z: 0}
+  m_LocalPosition: {x: 4.18913, y: 4.46652, z: 0}
   m_LocalScale: {x: 0.3498, y: 0.1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1275975050}
+  m_Father: {fileID: 1204105779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1881737203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881737198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e21c3ebead2826f4cb01008faecf1709, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::SceneDoorInteractable
+  promptTemplate: Press {key} to interact
+  targetSceneName: Level_2
+  requiredItemId: StaffKeycard
+  lockedMessage: The door is locked. You need a key.
+  openMessage: Door opened!
 --- !u!1 &1903343496
 GameObject:
   m_ObjectHideFlags: 0
@@ -7655,6 +8185,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1903343498}
   - component: {fileID: 1903343497}
+  - component: {fileID: 1903343500}
+  - component: {fileID: 1903343499}
   m_Layer: 0
   m_Name: Pallet_1_0 (1)
   m_TagString: Untagged
@@ -7728,13 +8260,71 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1903343496}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.386, y: -0.12958074, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.70509, y: -0.5085608, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1903343499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903343496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60e7d1ee853a4ee44aac556ca9c9dc11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::TrapKillZone2D
+--- !u!61 &1903343500
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903343496}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.13, y: 0.14}
+    newSize: {x: 0.13, y: 0.14}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.13, y: 0.14}
+  m_EdgeRadius: 0
 --- !u!1 &1924742544
 GameObject:
   m_ObjectHideFlags: 0
@@ -7883,6 +8473,7 @@ GameObject:
   - component: {fileID: 1943208319}
   - component: {fileID: 1943208318}
   - component: {fileID: 1943208320}
+  - component: {fileID: 1943208321}
   m_Layer: 0
   m_Name: Clue- hide
   m_TagString: Untagged
@@ -7899,11 +8490,11 @@ Transform:
   m_GameObject: {fileID: 1943208316}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.73, y: -4.02, z: 0}
+  m_LocalPosition: {x: 4.6841297, y: -3.8894799, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1535456954}
+  m_Father: {fileID: 1204105779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1943208318
 MonoBehaviour:
@@ -7918,16 +8509,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
   promptText: Press E to interact
-  interactionType: 0
-  infoText: 'This area looks like a great place to hide from the creature!
-
-    And
-    maybe I can even to lock it up here.. but how to do it?'
+  itemToPickup: {fileID: 0}
   itemId: 
-  destroyAfterInteract: 1
-  canInteractMultipleTimes: 0
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessagePrefix: 'Picked up: '
 --- !u!212 &1943208319
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -8032,6 +8617,23 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.64, y: 0.64}
   m_EdgeRadius: 0
+--- !u!114 &1943208321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1943208316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f7e30e6145b0f94fbf444fc1644af42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::TextOnInteract
+  promptTemplate: Press {key} to interact
+  message: another room? I should investigate! maybe I can find clues to get out
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1952251002
 GameObject:
   m_ObjectHideFlags: 0
@@ -8115,12 +8717,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1952251002}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.386, y: -0.423, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.70509, y: -0.80198, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1965346277
 GameObject:
@@ -8268,6 +8870,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1995038463}
   - component: {fileID: 1995038462}
+  - component: {fileID: 1995038464}
   m_Layer: 0
   m_Name: Container_10_Green_Vertical_Overgrown_Bleak-Yellow_0
   m_TagString: Untagged
@@ -8341,13 +8944,59 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1995038461}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.851, y: 4.57057, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -5.53191, y: 4.1915903, z: 0}
   m_LocalScale: {x: 1.5, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1535456954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &1995038464
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1995038461}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.29, y: 0.46}
+    newSize: {x: 0.29, y: 0.46}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.29, y: 0.46}
+  m_EdgeRadius: 0
 --- !u!1 &2000619647
 GameObject:
   m_ObjectHideFlags: 0
@@ -8495,18 +9144,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2000619647}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46d4e5511d87fae418ac98b76d4945ec, type: 3}
+  m_Script: {fileID: 11500000, guid: 93ad70cfc51193843ac718848ddd000d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
-  promptText: Press E to interact
-  interactionType: 1
-  infoText: You found an old photo of you , a Woman and a little girl. Who are those
-    people? you cant remember
+  m_EditorClassIdentifier: GameRuntime::PickupInteractable
+  promptTemplate: Press {key} to interact
   itemId: photo
-  destroyAfterInteract: 1
-  canInteractMultipleTimes: 0
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessageTemplate: 'Picked up: {item}'
+  disableOnPickup: 1
 --- !u!1 &2002563597
 GameObject:
   m_ObjectHideFlags: 0
@@ -8670,12 +9315,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2037699736}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.05547897, y: 0.05547897, z: 0.70492697, w: 0.70492697}
-  m_LocalPosition: {x: 6.64, y: -4.04, z: -0.82}
-  m_LocalScale: {x: 7.774144, y: 4.7929, z: 1}
+  m_LocalRotation: {x: 0.055478975, y: 0.055478975, z: 0.704927, w: 0.704927}
+  m_LocalPosition: {x: 5.5941296, y: -3.9094799, z: -0.82}
+  m_LocalScale: {x: 7.774143, y: 4.792899, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1275975050}
+  m_Father: {fileID: 1204105779}
   m_LocalEulerAnglesHint: {x: 0, y: 9, z: 90}
 --- !u!61 &2037699738
 BoxCollider2D:
@@ -8792,6 +9437,7 @@ GameObject:
   - component: {fileID: 2049617375}
   - component: {fileID: 2049617377}
   - component: {fileID: 2049617376}
+  - component: {fileID: 2049617378}
   m_Layer: 0
   m_Name: wall8 (2)
   m_TagString: Untagged
@@ -8845,7 +9491,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -8859,7 +9505,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.3, y: 0.3}
+  m_Size: {x: 0.3, y: 0.5}
   m_EdgeRadius: 0
 --- !u!212 &2049617377
 SpriteRenderer:
@@ -8919,6 +9565,25 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2049617378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2049617374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 612c6501f83de024a9814b6be954d3c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::TouchActionTrigger2D
+  playerTag: Player
+  messageOnTouch: The door collapsed
+  oneShot: 1
+  disableAfterTriggered: 1
+  onTriggered:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2077727873
 GameObject:
   m_ObjectHideFlags: 0
@@ -8933,6 +9598,7 @@ GameObject:
   - component: {fileID: 2077727877}
   - component: {fileID: 2077727876}
   - component: {fileID: 2077727875}
+  - component: {fileID: 2077727880}
   m_Layer: 0
   m_Name: Zombie_1 (fast)
   m_TagString: Untagged
@@ -8967,11 +9633,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74705525232806468c418246e6ff915, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieChasePlayer2D
-  moveSpeed: 5
-  matchPlayerSpeed: 1
-  detectionRadius: 2
-  loseRadius: 7
-  playerTransform: {fileID: 932308357}
+  returnSpeed: 1.4
+  detectionRange: 2.5
+  chaseSpeed: 2.2
+  loseRangeMultiplier: 1.2
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  playerTag: Player
 --- !u!50 &2077727876
 Rigidbody2D:
   serializedVersion: 5
@@ -9011,7 +9680,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b26c7c7bb669734aaf8510a688ae11c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieKillPlayer2D
-  gameOverMessage: The zombie caught you.
+  playerTag: Player
+  destroyOnKill: 1
+  disableRootOnKill: {fileID: 0}
 --- !u!61 &2077727878
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9116,6 +9787,27 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2077727880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2077727873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bac3a86a9d92524db58ec12608e3c36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::ZombieHealth2D
+  destroyOnDeath: 1
+  destroyDelay: 0
+  killOnTriggerEnter: 1
+  killTags:
+  - Trap
+  - PlayerAttack
+  disableBehaviours: []
+  disableColliders: []
+  disableRenderers: []
 --- !u!1 &2098707165
 GameObject:
   m_ObjectHideFlags: 0
@@ -9128,6 +9820,7 @@ GameObject:
   - component: {fileID: 2098707168}
   - component: {fileID: 2098707167}
   - component: {fileID: 2098707170}
+  - component: {fileID: 2098707171}
   m_Layer: 0
   m_Name: window
   m_TagString: Untagged
@@ -9248,11 +9941,11 @@ Transform:
   m_GameObject: {fileID: 2098707165}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.25, y: 3.78, z: 0}
+  m_LocalPosition: {x: -4.29587, y: 3.9105198, z: 0}
   m_LocalScale: {x: 4, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1535456954}
+  m_Father: {fileID: 1204105779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2098707170
 MonoBehaviour:
@@ -9267,16 +9960,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleInteractable2D
   promptText: Press E to interact
-  interactionType: 0
-  infoText: 'A zombie slams into the glass. Better stay quiet...
-
-    you can press
-    z to walk slowly..'
+  itemToPickup: {fileID: 0}
   itemId: 
-  destroyAfterInteract: 0
-  canInteractMultipleTimes: 1
-  objectToRemove: {fileID: 0}
-  deactivateInsteadOfDestroy: 0
+  amount: 1
+  pickupMessagePrefix: 'Picked up:'
+--- !u!114 &2098707171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2098707165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f7e30e6145b0f94fbf444fc1644af42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameRuntime::TextOnInteract
+  promptTemplate: Press {key} to interact
+  message: There is a zombie outside the window! I should keep quiet and not draw
+    its atention
+  onInteracted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -9284,23 +9989,8 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 932308357}
-  - {fileID: 1593378794}
   - {fileID: 598850969}
-  - {fileID: 400854755}
   - {fileID: 184344816}
-  - {fileID: 1535456954}
-  - {fileID: 632054141}
   - {fileID: 470669905}
   - {fileID: 621159049}
-  - {fileID: 306440545}
-  - {fileID: 1995038463}
-  - {fileID: 1699037445}
-  - {fileID: 376913478}
-  - {fileID: 1903343498}
-  - {fileID: 1952251004}
-  - {fileID: 1474598071}
-  - {fileID: 294571417}
-  - {fileID: 1595622921}
-  - {fileID: 709962060}
-  - {fileID: 1553156086}
-  - {fileID: 1518504764}
+  - {fileID: 1727240981}

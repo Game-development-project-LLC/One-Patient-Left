@@ -1,22 +1,49 @@
-using UnityEngine;
+//using UnityEngine;
 
-/// <summary>
-/// An interactable switch that triggers a SwitchPanelPuzzle option.
-/// </summary>
-public class SwitchInteractable : Interactable2D
-{
-    [Header("Switch Settings")]
-    [SerializeField] private SwitchPanelPuzzle panel;
-    [SerializeField] private string switchId = "emergency_exit";
+//public class SwitchInteractable : Interactable
+//{
+//    [Header("Switch Settings")]
+//    [SerializeField] private SwitchPanelPuzzle panel;
+//    [SerializeField] private string switchId;
 
-    public override void Interact(PlayerInteraction2D player)
-    {
-        if (panel == null)
-        {
-            UIManager.Instance?.ShowInfo("Switch is not connected to a panel.");
-            return;
-        }
+//    [Header("Behavior")]
+//    [Tooltip("If true, this switch disables itself after a successful solve.")]
+//    [SerializeField] private bool disableAfterSolved = false;
 
-        panel.ToggleSwitch(switchId);
-    }
-}
+//    public override void Interact(PlayerInteraction player)
+//    {
+//        if (panel == null)
+//        {
+//            Debug.LogWarning("SwitchInteractable: Panel reference is missing.", this);
+//            return;
+//        }
+
+//        if (string.IsNullOrWhiteSpace(switchId))
+//        {
+//            Debug.LogWarning("SwitchInteractable: switchId is empty.", this);
+//            return;
+//        }
+
+//        panel.ToggleSwitch(switchId);
+
+//        if (disableAfterSolved && panel.IsSolved)
+//            gameObject.SetActive(false);
+//    }
+
+//#if UNITY_EDITOR
+//    private void OnValidate()
+//    {
+//        if (panel == null)
+//        {
+//            // Try to auto-find a panel in parents (nice QoL)
+//            panel = GetComponentInParent<SwitchPanelPuzzle>();
+//        }
+
+//        if (panel != null && !string.IsNullOrWhiteSpace(switchId))
+//        {
+//            // No hard validation against puzzle list here (keeps this file independent),
+//            // but you can add custom checks if you want.
+//        }
+//    }
+//#endif
+//}

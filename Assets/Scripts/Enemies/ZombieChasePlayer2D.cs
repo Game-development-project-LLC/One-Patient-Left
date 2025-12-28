@@ -1,105 +1,95 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Zombie that stands still until the player is inside a detection radius,
-/// then chases the player using a constant move speed.
+/// Stays near its home position, chases the player when detected.
+/// Player is not detected while PlayerStealthState.IsStealth is true.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
-public class ZombieChasePlayer2D : MonoBehaviour
+public sealed class ZombieChasePlayer2D : MonoBehaviour
 {
-    [Header("Movement")]
-    [SerializeField] private float moveSpeed = 4f;
+    [Header("Home")]
+    [SerializeField] private float returnSpeed = 1.4f;
 
-    [Tooltip("If true, copies the player's normal move speed on Awake when found.")]
-    [SerializeField] private bool matchPlayerSpeed = true;
-
-    [Header("Detection")]
-    [SerializeField] private float detectionRadius = 5f;
-    [SerializeField] private float loseRadius = 7f;
-
-    [Header("References")]
-    [SerializeField] private Transform playerTransform = null;
+    [Header("Chase")]
+    [SerializeField] private float detectionRange = 2.5f;
+    [SerializeField] private float chaseSpeed = 2.2f;
+    [SerializeField] private float loseRangeMultiplier = 1.2f;
+    [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private string playerTag = "Player";
 
     private Rigidbody2D rb;
-    private bool isChasing = false;
+    private Transform playerTarget;
+    private Vector2 homePos;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        rb.gravityScale = 0f;
+        rb.freezeRotation = true;
 
-        // If the player reference is not set manually, try to find it automatically.
-#if UNITY_2023_1_OR_NEWER
-        if (playerTransform == null)
-        {
-            var player = Object.FindAnyObjectByType<PlayerMovement2D>();
-            if (player != null)
-            {
-                playerTransform = player.transform;
-
-                if (matchPlayerSpeed)
-                {
-                    moveSpeed = player.getNormalSpeed();
-                }
-            }
-        }
-#else
-        if (playerTransform == null)
-        {
-            var player = FindObjectOfType<PlayerMovement2D>();
-            if (player != null)
-            {
-                playerTransform = player.transform;
-
-                if (matchPlayerSpeed)
-                {
-                    moveSpeed = player.getNormalSpeed();
-                }
-            }
-        }
-#endif
+        homePos = rb.position;
     }
 
     private void FixedUpdate()
     {
-        if (playerTransform == null)
+        UpdateTarget();
+
+        if (playerTarget != null)
         {
-            return; // no player to chase
+            MoveTowards(playerTarget.position, chaseSpeed);
+            return;
         }
 
-        Vector2 zombiePosition = rb.position;
-        Vector2 playerPosition = playerTransform.position;
-        float distanceToPlayer = Vector2.Distance(zombiePosition, playerPosition);
+        // Return home
+        MoveTowards(homePos, returnSpeed);
+    }
 
-        // Start chasing
-        if (!isChasing && distanceToPlayer <= detectionRadius)
+    private void UpdateTarget()
+    {
+        if (playerTarget != null)
         {
-            isChasing = true;
+            if (IsPlayerHidden(playerTarget))
+            {
+                playerTarget = null;
+                return;
+            }
+
+            float maxDist = detectionRange * loseRangeMultiplier;
+            if (Vector2.Distance(transform.position, playerTarget.position) > maxDist)
+                playerTarget = null;
+
+            return;
         }
 
-        // Stop chasing
-        if (isChasing && distanceToPlayer >= loseRadius)
-        {
-            isChasing = false;
-        }
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, detectionRange, playerLayer);
+        if (hit == null) return;
+        if (!hit.CompareTag(playerTag)) return;
 
-        // Move only while chasing
-        if (isChasing)
-        {
-            Vector2 direction = (playerPosition - zombiePosition).normalized;
-            Vector2 targetPosition =
-                zombiePosition + direction * moveSpeed * Time.fixedDeltaTime;
+        Transform candidate = hit.transform;
+        if (IsPlayerHidden(candidate)) return;
 
-            rb.MovePosition(targetPosition);
-        }
+        playerTarget = candidate;
+    }
+
+    private bool IsPlayerHidden(Transform player)
+    {
+        var stealth = player.GetComponentInParent<PlayerStealthState>();
+        return stealth != null && stealth.IsStealth;
+    }
+
+    private void MoveTowards(Vector2 target, float speed)
+    {
+        Vector2 pos = rb.position;
+        Vector2 dir = target - pos;
+
+        if (dir.sqrMagnitude < 0.0001f) return;
+
+        Vector2 next = pos + dir.normalized * speed * Time.fixedDeltaTime;
+        rb.MovePosition(next);
     }
 
     private void OnDrawGizmosSelected()
     {
-        // Visualize detection and lose radii in the Scene view
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, loseRadius);
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
     }
 }

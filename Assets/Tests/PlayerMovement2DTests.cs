@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerMovement2DTests
 {
     private GameObject playerObject;
-    private PlayerMovement2D player;
+    private PlayerMovement player;
     private Rigidbody2D rb;
 
     [SetUp]
@@ -13,7 +13,7 @@ public class PlayerMovement2DTests
     {
         playerObject = new GameObject("Player");
         rb = playerObject.AddComponent<Rigidbody2D>();
-        player = playerObject.AddComponent<PlayerMovement2D>();
+        player = playerObject.AddComponent<PlayerMovement>();
     }
 
     [TearDown]
@@ -41,7 +41,7 @@ public class PlayerMovement2DTests
     [Test]
     public void HandleSpeedToggle_UpdatesCurrentSpeedAccordingToFlag()
     {
-        var type = typeof(PlayerMovement2D);
+        var type = typeof(PlayerMovement);
 
         var method = type.GetMethod("HandleSpeedToggle",
             BindingFlags.NonPublic | BindingFlags.Instance);

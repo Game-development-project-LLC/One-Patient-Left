@@ -5,7 +5,8 @@
         "UnityEngine.TestRunner",
         "Unity.PlasticSCM.Editor",
         "GameRuntime",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"

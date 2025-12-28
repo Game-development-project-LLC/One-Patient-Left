@@ -44,7 +44,7 @@ public void Awake_MatchesPlayerSpeed_WhenPlayerExists()
     // Create player first so the zombie can find it
     var playerObject = new GameObject("Player");
     playerObject.AddComponent<Rigidbody2D>();
-    var playerMovement = playerObject.AddComponent<PlayerMovement2D>();
+    var playerMovement = playerObject.AddComponent<PlayerMovement>();
 
     // Set player's normalSpeed via reflection
     SetPrivateField(playerMovement, "normalSpeed", 6f);

@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using UnityEngine.SceneManagement;
-using TMPro;
+﻿using TMPro;
+using UnityEngine;
 
 /// <summary>
-/// Handles simple UI: interaction prompt, info messages and game over panel.
+/// Simple UI manager for prompt/info/game over.
 /// </summary>
 public class UIManager : MonoBehaviour
 {
@@ -26,92 +25,62 @@ public class UIManager : MonoBehaviour
         }
 
         Instance = this;
-    }
+        DontDestroyOnLoad(gameObject);
 
-    private void Start()
-    {
         HidePrompt();
-        ClearInfo();
-
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(false);
-        }
+        HideInfo();
+        HideGameOver();
     }
 
-    // ===== Prompt =====
+    // ---------------- Prompt ----------------
+
     public void ShowPrompt(string text)
     {
-        if (promptText == null)
-        {
-            return;
-        }
-
-        promptText.text = text;
+        if (promptText == null) return;
         promptText.gameObject.SetActive(true);
+        promptText.text = text;
     }
 
     public void HidePrompt()
     {
-        if (promptText == null)
-        {
-            return;
-        }
-
+        if (promptText == null) return;
         promptText.text = string.Empty;
         promptText.gameObject.SetActive(false);
     }
 
-    // ===== Info =====
+    // ---------------- Info ----------------
+
     public void ShowInfo(string text)
     {
-        if (infoText == null)
-        {
-            return;
-        }
-
-        infoText.text = text;
+        if (infoText == null) return;
         infoText.gameObject.SetActive(true);
+        infoText.text = text;
     }
 
     public void ClearInfo()
     {
-        if (infoText == null)
-        {
-            return;
-        }
-
+        if (infoText == null) return;
         infoText.text = string.Empty;
     }
 
-    // ===== Game Over =====
+    // Backwards-compatible name (your PlayerInteraction expects this)
+    public void HideInfo()
+    {
+        if (infoText == null) return;
+        infoText.text = string.Empty;
+        infoText.gameObject.SetActive(false);
+    }
+
+    // ---------------- Game Over ----------------
+
     public void ShowGameOver(string message)
     {
-        if (gameOverText != null)
-        {
-            gameOverText.text = message;
-        }
-
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(true);
-        }
+        if (gameOverText != null) gameOverText.text = message;
+        if (gameOverPanel != null) gameOverPanel.SetActive(true);
     }
 
     public void HideGameOver()
     {
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(false);
-        }
-    }
-
-    /// <summary>
-    /// Reloads the currently active scene. Hook this to the Restart button.
-    /// </summary>
-    public void RestartLevel()
-    {
-        var scene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(scene.name);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
     }
 }
