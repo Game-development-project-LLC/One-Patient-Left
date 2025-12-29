@@ -21,16 +21,26 @@ public class PlayerInventory : MonoBehaviour
         [Min(1)] public int amount = 1;
     }
 
+    // --- זה הפורמט שנשמר לענן (itemId + amount) ---
+    [Serializable]
+    public class SimpleItemStack
+    {
+        public string itemId;
+        public int amount;
+    }
+
     // List for stable ordering + dictionary for fast lookups.
     [SerializeField] private List<InventoryEntry> entries = new List<InventoryEntry>();
     private Dictionary<ItemDefinition, int> counts = new Dictionary<ItemDefinition, int>();
 
     private bool inventoryVisible;
 
+    // Optional: מי שרוצה UI יכול להירשם לאירוע הזה
+    public event Action<string> InventoryTextChanged;
+
     private void Awake()
     {
         RebuildCountsFromEntries();
-        SaveGameManager.Instance?.BindInventory(this);
     }
 
     private void OnEnable()
@@ -54,11 +64,8 @@ public class PlayerInventory : MonoBehaviour
     private void OnToggleInventoryPerformed(InputAction.CallbackContext ctx)
     {
         inventoryVisible = !inventoryVisible;
-
-        if (inventoryVisible)
-            UIManager.Instance?.ShowInfo(GetInventoryText());
-        else
-            UIManager.Instance?.ClearInfo();
+        if (inventoryVisible) EmitInventoryText();
+        else InventoryTextChanged?.Invoke(string.Empty);
     }
 
     // ----------------- Public API -----------------
@@ -95,9 +102,7 @@ public class PlayerInventory : MonoBehaviour
         int next = Mathf.Min(current + addAmount, item.MaxStack);
 
         SetCount(item, next);
-        RefreshInventoryUIIfVisible();
-
-        SaveGameManager.Instance?.MarkDirty();
+        EmitInventoryText();
     }
 
     public bool HasItem(string itemId)
@@ -140,8 +145,7 @@ public class PlayerInventory : MonoBehaviour
         int next = Mathf.Max(0, current - amount);
         SetCount(item, next);
 
-        RefreshInventoryUIIfVisible();
-        SaveGameManager.Instance?.MarkDirty();
+        EmitInventoryText();
         return true;
     }
 
@@ -174,11 +178,12 @@ public class PlayerInventory : MonoBehaviour
         return sb.ToString();
     }
 
-    // ----------------- Save/Load helpers -----------------
+    // ----------------- Save/Load (Cloud Save friendly) -----------------
 
-    public List<SaveGameManager.ItemStack> ExportForSave()
+    // מה שה־GameFlowManager ישתמש בו כדי לשמור
+    public List<SimpleItemStack> GetItemsForSave()
     {
-        var list = new List<SaveGameManager.ItemStack>();
+        var list = new List<SimpleItemStack>();
 
         foreach (var kvp in counts)
         {
@@ -186,19 +191,16 @@ public class PlayerInventory : MonoBehaviour
             int amount = kvp.Value;
             if (item == null || amount <= 0) continue;
 
-            // חייב להיות ID יציב. אם ל-ItemDefinition שלך יש שדה Id / ItemId - תשתמש בו.
-            // אם אין, אפשר להשתמש ב-name בתור fallback (אבל עדיף שדה Id).
             string id = !string.IsNullOrWhiteSpace(item.Id) ? item.Id : item.name;
-
-            list.Add(new SaveGameManager.ItemStack { itemId = id, amount = amount });
+            list.Add(new SimpleItemStack { itemId = id, amount = amount });
         }
 
         return list;
     }
 
-    public void ApplySave(List<SaveGameManager.ItemStack> saved)
+    // מה שה־GameFlowManager יקרא אחרי Load
+    public void ApplySaveStacks(List<SimpleItemStack> saved)
     {
-        // ננקה את המצב הנוכחי
         entries.Clear();
         counts.Clear();
 
@@ -214,10 +216,16 @@ public class PlayerInventory : MonoBehaviour
             }
         }
 
-        RefreshInventoryUIIfVisible();
+        EmitInventoryText();
     }
 
     // ----------------- Internals -----------------
+
+    private void EmitInventoryText()
+    {
+        if (!inventoryVisible) return;
+        InventoryTextChanged?.Invoke(GetInventoryText());
+    }
 
     private ItemDefinition ResolveItem(string itemId)
     {
@@ -280,11 +288,5 @@ public class PlayerInventory : MonoBehaviour
             if (entries[i] != null && entries[i].item == item)
                 entries.RemoveAt(i);
         }
-    }
-
-    private void RefreshInventoryUIIfVisible()
-    {
-        if (!inventoryVisible) return;
-        UIManager.Instance?.ShowInfo(GetInventoryText());
     }
 }
