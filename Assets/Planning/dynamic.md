@@ -1,7 +1,7 @@
 # md.dynamic — One Last Patient (Dynamic Design)
 
 **Game Name:** One Last Patient  
-**Genre:** Survival / Horror (Top-Down)  
+**Genre:** Survival / Horror / Investigation 
 **Project Status:** In development (work-in-progress)  
 
 ---
