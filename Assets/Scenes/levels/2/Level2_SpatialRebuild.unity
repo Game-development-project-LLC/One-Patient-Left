@@ -3380,6 +3380,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   playerTag: Player
+  detectTriggerColliders: 1
 --- !u!50 &422426465
 Rigidbody2D:
   serializedVersion: 5
@@ -5091,6 +5092,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   playerTag: Player
+  detectTriggerColliders: 1
 --- !u!50 &747457632
 Rigidbody2D:
   serializedVersion: 5
@@ -7120,7 +7122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78540e15844800e4989c5816a6eaea0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameRuntime::PlayerOneHitDeath
-  gameOverPanel: {fileID: 0}
+  gameOverPanel: {fileID: 1896104912}
   disableOnDeath:
   - {fileID: 1022840535}
   - {fileID: 1022840536}
@@ -10935,6 +10937,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   playerTag: Player
+  detectTriggerColliders: 1
 --- !u!50 &1690353739
 Rigidbody2D:
   serializedVersion: 5
@@ -12618,6 +12621,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc320a7590ab006409fc33607683cb56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  persistAcrossScenes: 0
   promptText: {fileID: 184041648}
   infoText: {fileID: 1336502725}
   gameOverPanel: {fileID: 1896104912}

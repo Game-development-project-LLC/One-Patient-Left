@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -21,7 +21,7 @@ public class PlayerInventory : MonoBehaviour
         [Min(1)] public int amount = 1;
     }
 
-    // We keep a list for stable ordering (UI) + a dictionary for fast lookups.
+    // List for stable ordering + dictionary for fast lookups.
     [SerializeField] private List<InventoryEntry> entries = new List<InventoryEntry>();
     private Dictionary<ItemDefinition, int> counts = new Dictionary<ItemDefinition, int>();
 
@@ -30,6 +30,7 @@ public class PlayerInventory : MonoBehaviour
     private void Awake()
     {
         RebuildCountsFromEntries();
+        SaveGameManager.Instance?.BindInventory(this);
     }
 
     private void OnEnable()
@@ -60,10 +61,8 @@ public class PlayerInventory : MonoBehaviour
             UIManager.Instance?.ClearInfo();
     }
 
-    /// <summary>
-    /// Backwards-compatible API: Add by string ID (e.g. "photo", "staff_keycard").
-    /// This will resolve through ItemDatabase. If not found, it will log a warning.
-    /// </summary>
+    // ----------------- Public API -----------------
+
     public void AddItem(string itemId, int amount = 1)
     {
         if (amount <= 0) return;
@@ -96,9 +95,9 @@ public class PlayerInventory : MonoBehaviour
         int next = Mathf.Min(current + addAmount, item.MaxStack);
 
         SetCount(item, next);
-
-        Debug.Log($"Inventory: added {item.DisplayName} (x{addAmount})");
         RefreshInventoryUIIfVisible();
+
+        SaveGameManager.Instance?.MarkDirty();
     }
 
     public bool HasItem(string itemId)
@@ -142,38 +141,7 @@ public class PlayerInventory : MonoBehaviour
         SetCount(item, next);
 
         RefreshInventoryUIIfVisible();
-        return true;
-    }
-
-    /// <summary>
-    /// Optional: Use an item by ID. If it has an effect, apply it, and if it's Consumable remove 1.
-    /// </summary>
-    public bool TryUseItem(string itemId)
-    {
-        ItemDefinition item = ResolveItem(itemId);
-        if (item == null) return false;
-
-        return TryUseItem(item);
-    }
-
-    public bool TryUseItem(ItemDefinition item)
-    {
-        if (item == null) return false;
-        if (!HasItem(item)) return false;
-
-        if (item.UseEffect == null)
-        {
-            Debug.Log($"Inventory: '{item.DisplayName}' has no use effect.");
-            return false;
-        }
-
-        bool applied = item.UseEffect.TryApply(gameObject, this);
-        if (!applied) return false;
-
-        if (item.Type == ItemType.Consumable)
-            TryRemoveItem(item, 1);
-
-        RefreshInventoryUIIfVisible();
+        SaveGameManager.Instance?.MarkDirty();
         return true;
     }
 
@@ -204,6 +172,49 @@ public class PlayerInventory : MonoBehaviour
             return "Inventory: (empty)";
 
         return sb.ToString();
+    }
+
+    // ----------------- Save/Load helpers -----------------
+
+    public List<SaveGameManager.ItemStack> ExportForSave()
+    {
+        var list = new List<SaveGameManager.ItemStack>();
+
+        foreach (var kvp in counts)
+        {
+            ItemDefinition item = kvp.Key;
+            int amount = kvp.Value;
+            if (item == null || amount <= 0) continue;
+
+            // חייב להיות ID יציב. אם ל-ItemDefinition שלך יש שדה Id / ItemId - תשתמש בו.
+            // אם אין, אפשר להשתמש ב-name בתור fallback (אבל עדיף שדה Id).
+            string id = !string.IsNullOrWhiteSpace(item.Id) ? item.Id : item.name;
+
+            list.Add(new SaveGameManager.ItemStack { itemId = id, amount = amount });
+        }
+
+        return list;
+    }
+
+    public void ApplySave(List<SaveGameManager.ItemStack> saved)
+    {
+        // ננקה את המצב הנוכחי
+        entries.Clear();
+        counts.Clear();
+
+        if (saved != null)
+        {
+            foreach (var s in saved)
+            {
+                if (s == null) continue;
+                if (string.IsNullOrWhiteSpace(s.itemId)) continue;
+                if (s.amount <= 0) continue;
+
+                AddItem(s.itemId, s.amount);
+            }
+        }
+
+        RefreshInventoryUIIfVisible();
     }
 
     // ----------------- Internals -----------------
