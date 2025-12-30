@@ -1,9 +1,18 @@
-﻿using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Services
 {
+    /// <summary>
+    /// Minimal UI controller for login/registration and quick Cloud Save actions.
+    /// Intended for a simple "Open / Main Menu" scene used during development.
+    /// </summary>
+    /// <remarks>
+    /// The button callbacks are implemented as <c>async void</c> because Unity UI event handlers
+    /// do not support <c>Task</c> signatures directly. Exceptions are handled with try/catch and
+    /// surfaced to a status text + Debug.Log.
+    /// </remarks>
     public class LoginUIController : MonoBehaviour
     {
         [Header("UI")]
@@ -18,6 +27,7 @@ namespace Services
 
         private void Awake()
         {
+            // Wire UI buttons to handlers.
             registerButton.onClick.AddListener(OnRegisterClicked);
             loginButton.onClick.AddListener(OnLoginClicked);
             logoutButton.onClick.AddListener(OnLogoutClicked);
@@ -27,6 +37,9 @@ namespace Services
             SetStatus("Ready.");
         }
 
+        /// <summary>
+        /// Registers a new account and signs in.
+        /// </summary>
         private async void OnRegisterClicked()
         {
             try
@@ -41,6 +54,9 @@ namespace Services
             }
         }
 
+        /// <summary>
+        /// Signs in and immediately loads stage 1 (or you can change this to load from Cloud Save).
+        /// </summary>
         private async void OnLoginClicked()
         {
             try
@@ -49,7 +65,7 @@ namespace Services
                 await AuthManager.Instance.LoginAsync(usernameInput.text, passwordInput.text);
                 SetStatus($"Signed In. PlayerId={AuthManager.Instance.PlayerId}");
 
-                // אחרי login: התחל משחק (stage 1) או לטעון מהענן אם אתה רוצה
+                // After login: start gameplay. You can swap this to LoadAndApplyAsync() if desired.
                 await GameFlowManager.Instance.StartGameFromStageAsync(1);
             }
             catch (System.Exception e)
@@ -58,12 +74,18 @@ namespace Services
             }
         }
 
+        /// <summary>
+        /// Signs out the current user.
+        /// </summary>
         private void OnLogoutClicked()
         {
             AuthManager.Instance.Logout();
             SetStatus("Signed out.");
         }
 
+        /// <summary>
+        /// Loads stage + inventory from Cloud Save and switches to the stage scene.
+        /// </summary>
         private async void OnLoadClicked()
         {
             try
@@ -78,13 +100,19 @@ namespace Services
             }
         }
 
+        /// <summary>
+        /// Saves to Cloud Save.
+        /// </summary>
+        /// <remarks>
+        /// If you click Save in a non-gameplay scene, there may be no PlayerInventory present.
+        /// This example saves stage only (inventory = null). For a full save, call
+        /// <see cref="GameFlowManager.SaveAsync(PlayerInventory)"/> from inside a gameplay scene.
+        /// </remarks>
         private async void OnSaveClicked()
         {
             try
             {
                 SetStatus("Saving...");
-                // אם אתה לוחץ Save במסך Open, אין PlayerInventory בסצנה הזו.
-                // אז Save אמיתי תעשה מתוך Level_1 (או תעשה רק stage כאן).
                 await CloudSaveStore.Instance.SaveAsync(GameFlowManager.Instance.CurrentStage, null);
                 SetStatus("Saved (stage only).");
             }
@@ -94,6 +122,9 @@ namespace Services
             }
         }
 
+        /// <summary>
+        /// Updates the UI status label and logs to the console.
+        /// </summary>
         private void SetStatus(string msg)
         {
             if (statusText != null) statusText.text = msg;
