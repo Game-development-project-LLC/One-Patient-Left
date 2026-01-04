@@ -11,12 +11,12 @@ TagManager:
   - Characters
   - Water
   - UI
+  - Backround
+  - Floor
+  - Walls
+  - Props
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - UI
   - 
   - 
   - 
@@ -41,13 +41,16 @@ TagManager:
   - name: Floor
     uniqueID: 3096164453
     locked: 0
+  - name: Backround
+    uniqueID: 2595362061
+    locked: 0
   - name: Walls
     uniqueID: 4107461495
     locked: 0
   - name: Props
     uniqueID: 2903499241
     locked: 0
-  - name: Entities
+  - name: Characters
     uniqueID: 3389525707
     locked: 0
   - name: UI
@@ -55,6 +58,9 @@ TagManager:
     locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: New Layer 7
+    uniqueID: 1612016901
     locked: 0
   m_RenderingLayers:
   - Default

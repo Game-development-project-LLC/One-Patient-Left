@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Detects nearby Interactable objects (2D trigger),
-/// shows prompt, and triggers Interact() on key press.
+/// shows a prompt, and triggers Interact() on key press.
 /// Also hides info text when the player moves.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
@@ -20,6 +20,10 @@ public class PlayerInteraction : MonoBehaviour
     private Vector3 lastPosition;
     private bool infoVisible;
 
+    // When the player interacts, we suppress the prompt until they leave the trigger
+    // (or until RefreshPrompt() is called, e.g., after closing a notice window).
+    private bool suppressPromptUntilExit;
+
     private void Awake()
     {
         lastPosition = transform.position;
@@ -32,6 +36,9 @@ public class PlayerInteraction : MonoBehaviour
             interactAction.action.Enable();
             interactAction.action.performed += OnInteractPerformed;
         }
+
+        // If we were re-enabled (e.g., after a modal lock), try to restore prompt state.
+        RefreshPrompt();
     }
 
     private void OnDisable()
@@ -63,6 +70,11 @@ public class PlayerInteraction : MonoBehaviour
         if (interactable == null) return;
 
         current = interactable;
+
+        // Don't show prompt while a modal/notice is open, or if we've suppressed it after an interact.
+        if (UIManager.Instance != null && UIManager.Instance.IsNoticeOpen) return;
+        if (suppressPromptUntilExit) return;
+
         UIManager.Instance?.ShowPrompt(current.GetPromptText(interactKeyDisplay));
     }
 
@@ -74,6 +86,8 @@ public class PlayerInteraction : MonoBehaviour
         if (current == interactable)
         {
             current = null;
+            suppressPromptUntilExit = false;
+
             UIManager.Instance?.HidePrompt();
             UIManager.Instance?.HideInfo();
             infoVisible = false;
@@ -82,7 +96,17 @@ public class PlayerInteraction : MonoBehaviour
 
     private void OnInteractPerformed(InputAction.CallbackContext _)
     {
+        // If a notice window is open, ignore interaction.
+        if (UIManager.Instance != null && UIManager.Instance.IsNoticeOpen) return;
+
         if (current == null) return;
+
+        // Hide the "Press E" prompt when interacting so only the new message remains.
+        UIManager.Instance?.HidePrompt();
+
+        // Suppress the prompt until we exit the trigger (or RefreshPrompt is called).
+        suppressPromptUntilExit = true;
+
         current.Interact(this);
     }
 
@@ -99,9 +123,18 @@ public class PlayerInteraction : MonoBehaviour
         infoVisible = false;
     }
 
+    /// <summary>
+    /// Re-shows the prompt for the current interactable (if any), unless a notice is open.
+    /// Calling this also clears prompt suppression.
+    /// </summary>
     public void RefreshPrompt()
     {
         if (current == null) return;
+
+        // If a notice is open, don't show prompt yet.
+        if (UIManager.Instance != null && UIManager.Instance.IsNoticeOpen) return;
+
+        suppressPromptUntilExit = false;
         UIManager.Instance?.ShowPrompt(current.GetPromptText(interactKeyDisplay));
     }
 
