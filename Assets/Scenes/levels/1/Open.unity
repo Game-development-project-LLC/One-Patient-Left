@@ -941,14 +941,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbc285a92638e9043ba33ff2677da86f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameRuntime::Services.LoginUIController
+  signInPanel: {fileID: 1627640158}
+  introPanel: {fileID: 1247228364}
   usernameInput: {fileID: 1916330446}
   passwordInput: {fileID: 2039187882}
   registerButton: {fileID: 631139481}
   loginButton: {fileID: 28714358}
-  logoutButton: {fileID: 0}
-  loadButton: {fileID: 0}
-  saveButton: {fileID: 0}
-  statusText: {fileID: 20775499}
+  signInStatusText: {fileID: 0}
+  startNewButton: {fileID: 1754724235}
+  loadButton: {fileID: 954423381}
+  introStatusText: {fileID: 1220135727}
 --- !u!1 &590823181
 GameObject:
   m_ObjectHideFlags: 0
@@ -1799,7 +1801,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameRuntime::Services.GameFlowManager
   stageSceneNames:
-  - Intro
   - Level_1
   - Level_2
   - Level_1
