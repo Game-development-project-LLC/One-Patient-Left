@@ -5,6 +5,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
+
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
@@ -12,6 +16,10 @@ public class UIManager : MonoBehaviour
     [Header("Behavior")]
     [SerializeField] private bool persistAcrossScenes = false;
     [SerializeField] private float fadeDuration = 0.5f;
+
+    [Header("Notice Keyboard")]
+    [SerializeField] private bool closeNoticeWithKeyboard = true;
+    [SerializeField] private bool anyKeyClosesNotice = false;
 
     [Header("HUD")]
     [SerializeField] private TMP_Text promptText;
@@ -32,11 +40,21 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TMP_Text gameOverText;
 
-    /// <summary>
-    /// True while the notice/modal window is open.
-    /// PlayerInteraction uses this to avoid showing prompts or accepting input.
-    /// </summary>
-    public bool IsNoticeOpen { get; private set; }
+    [Header("Game Over Messages By Reason")]
+    [TextArea(2, 6)]
+    [SerializeField]
+    private string gameOverDefaultMessage =
+        "Your journey ends here. The hospital keeps its secrets, and you become one more silent room in its endless hallways.";
+
+    [TextArea(2, 6)]
+    [SerializeField]
+    private string gameOverZombieMessage =
+        "You feel a wet breath at your neck. Fingers like ice close around you, and the corridor swallows your last scream.";
+
+    [TextArea(2, 6)]
+    [SerializeField]
+    private string gameOverTrapMessage =
+        "One careless step. The floor gives way, and the world drops out from under you—metal, darkness, and silence.";
 
     // Toast queue
     private readonly Queue<(string msg, float duration)> toastQueue = new();
@@ -47,6 +65,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private bool lockPlayerWhileNoticeOpen = true;
     [SerializeField] private string playerTag = "Player";
     private MonoBehaviour[] cachedPlayerBehaviours;
+
+    // Pause whole game while notice is open (optional)
+    private bool _pausedByNotice = false;
+    private float _prevTimeScale = 1f;
 
     private void Awake()
     {
@@ -69,13 +91,30 @@ public class UIManager : MonoBehaviour
 
         SetGroupVisible(toastGroup, false, instant: true);
         SetGroupVisible(noticeGroup, false, instant: true);
-        IsNoticeOpen = false;
 
         if (noticeContinueButton != null)
             noticeContinueButton.onClick.AddListener(HideNotice);
 
         if (noticeCloseButton != null)
             noticeCloseButton.onClick.AddListener(HideNotice);
+    }
+
+    private void Update()
+    {
+        if (!closeNoticeWithKeyboard) return;
+        if (!IsNoticeOpen) return;
+
+        if (anyKeyClosesNotice)
+        {
+            if (WasAnyKeyPressedThisFrame())
+            {
+                HideNotice();
+            }
+            return;
+        }
+
+        if (WasNoticeCloseKeyPressedThisFrame())
+            HideNotice();
     }
 
     // -----------------------------
@@ -121,10 +160,7 @@ public class UIManager : MonoBehaviour
     private void EnqueueToast(string msg, float duration)
     {
         if (toastText == null || toastGroup == null)
-        {
-            // fallback: do nothing
             return;
-        }
 
         toastQueue.Enqueue((msg, duration));
         if (toastRoutine == null)
@@ -156,13 +192,25 @@ public class UIManager : MonoBehaviour
     // -----------------------------
     // Notice window (Intro/Instructions/any modal)
     // -----------------------------
+    // Old signature (kept!) - 3rd parameter is continue button label.
     public void ShowNotice(string title, string body, string continueLabel = "Continue")
     {
-        IsNoticeOpen = true;
+        ShowNoticeInternal(title, body, continueLabel, pauseGame: false);
+    }
 
-        // Important: hide HUD prompt so it doesn't overlap the notice content.
-        HidePrompt();
+    // New overloads - allow passing "pauseGame" as 3rd argument.
+    public void ShowNotice(string title, string body, bool pauseGame)
+    {
+        ShowNoticeInternal(title, body, continueLabel: "Continue", pauseGame: pauseGame);
+    }
 
+    public void ShowNotice(string title, string body, bool pauseGame, string continueLabel)
+    {
+        ShowNoticeInternal(title, body, continueLabel, pauseGame);
+    }
+
+    private void ShowNoticeInternal(string title, string body, string continueLabel, bool pauseGame)
+    {
         if (noticeTitle != null) noticeTitle.text = title;
         if (noticeBody != null) noticeBody.text = body;
 
@@ -176,28 +224,34 @@ public class UIManager : MonoBehaviour
 
         if (lockPlayerWhileNoticeOpen)
             SetPlayerLocked(true);
+
+        if (pauseGame)
+            PauseByNotice();
     }
 
     public void HideNotice()
     {
         SetGroupVisible(noticeGroup, false, instant: false);
-        IsNoticeOpen = false;
 
         if (lockPlayerWhileNoticeOpen)
             SetPlayerLocked(false);
 
-        // If the player is still in an interactable trigger, restore the prompt.
-        TryRefreshPlayerPrompt();
+        ResumeIfPausedByNotice();
     }
 
-    private void TryRefreshPlayerPrompt()
+    private void PauseByNotice()
     {
-        var player = GameObject.FindGameObjectWithTag(playerTag);
-        if (player == null) return;
+        if (_pausedByNotice) return;
+        _pausedByNotice = true;
+        _prevTimeScale = Time.timeScale;
+        Time.timeScale = 0f;
+    }
 
-        var interaction = player.GetComponent<PlayerInteraction>();
-        if (interaction != null)
-            interaction.RefreshPrompt();
+    private void ResumeIfPausedByNotice()
+    {
+        if (!_pausedByNotice) return;
+        _pausedByNotice = false;
+        Time.timeScale = _prevTimeScale;
     }
 
     private void SetPlayerLocked(bool locked)
@@ -214,14 +268,13 @@ public class UIManager : MonoBehaviour
         foreach (var b in cachedPlayerBehaviours)
         {
             if (b == null) continue;
-            // lock only movement/interaction like you do today
             if (b is PlayerMovement) b.enabled = !locked;
             if (b is PlayerInteraction) b.enabled = !locked;
         }
     }
 
     // -----------------------------
-    // GameOver (existing API)
+    // GameOver
     // -----------------------------
     public void ShowGameOver(string message)
     {
@@ -285,5 +338,66 @@ public class UIManager : MonoBehaviour
         }
 
         group.alpha = target;
+    }
+
+    public bool IsNoticeOpen => noticeGroup != null && noticeGroup.alpha > 0.001f;
+
+    public string GetGameOverMessage(DeathReason reason)
+    {
+        string fallback = string.IsNullOrEmpty(gameOverDefaultMessage) ? "Game Over." : gameOverDefaultMessage;
+
+        switch (reason)
+        {
+            case DeathReason.Zombie:
+                return string.IsNullOrEmpty(gameOverZombieMessage) ? fallback : gameOverZombieMessage;
+
+            case DeathReason.Trap:
+                return string.IsNullOrEmpty(gameOverTrapMessage) ? fallback : gameOverTrapMessage;
+
+            default:
+                return fallback;
+        }
+    }
+
+    public void ShowGameOver(DeathReason reason)
+    {
+        ShowGameOver(GetGameOverMessage(reason));
+    }
+
+    private bool WasNoticeCloseKeyPressedThisFrame()
+    {
+#if ENABLE_INPUT_SYSTEM
+        var kb = Keyboard.current;
+        if (kb != null)
+        {
+            if (kb.enterKey.wasPressedThisFrame) return true;
+            if (kb.numpadEnterKey.wasPressedThisFrame) return true;
+            if (kb.spaceKey.wasPressedThisFrame) return true;
+            if (kb.escapeKey.wasPressedThisFrame) return true;
+            if (kb.eKey.wasPressedThisFrame) return true;
+        }
+#endif
+
+#if ENABLE_LEGACY_INPUT_MANAGER
+        if (Input.GetKeyDown(KeyCode.Return)) return true;
+        if (Input.GetKeyDown(KeyCode.KeypadEnter)) return true;
+        if (Input.GetKeyDown(KeyCode.Space)) return true;
+        if (Input.GetKeyDown(KeyCode.Escape)) return true;
+        if (Input.GetKeyDown(KeyCode.E)) return true;
+#endif
+        return false;
+    }
+
+    private bool WasAnyKeyPressedThisFrame()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
+            return true;
+#endif
+
+#if ENABLE_LEGACY_INPUT_MANAGER
+        if (Input.anyKeyDown) return true;
+#endif
+        return false;
     }
 }

@@ -88,7 +88,7 @@ public class InstructionsController : MonoBehaviour
 
         isVisible = false;
 
-        UIManager.Instance?.ClearInfo();
+        UIManager.Instance?.HideInfo();
 
         SetPlayerInputEnabled(true);
     }
