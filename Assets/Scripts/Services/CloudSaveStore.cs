@@ -98,7 +98,7 @@ namespace Services
             var keys = new HashSet<string> { KEY_STAGE, KEY_INVENTORY_JSON };
             var loaded = await CloudSaveService.Instance.Data.Player.LoadAsync(keys);
 
-            int stage = 1;
+            int stage = 0;
             List<ItemStack> inventory = new List<ItemStack>();
 
             if (loaded.TryGetValue(KEY_STAGE, out var stageItem) && stageItem != null)
@@ -121,5 +121,35 @@ namespace Services
 
             return (stage, inventory);
         }
+
+        /// <summary>
+        /// Returns true if we have a non-empty saved stage.
+        /// (We treat empty / missing stage as "no save".)
+        /// </summary>
+        public async Task<bool> HasSaveAsync()
+        {
+            var (stage, _) = await LoadAsync();
+            // A valid save is any stage > 0.
+            return stage > 0;
+        }
+
+        /// <summary>
+        /// Starts a brand-new save (clears inventory) at the given stage/scene name.
+        /// </summary>
+        public Task SaveNewGameAsync(string startStage)
+        {
+            // Empty inventory on new game.
+            return SaveAsync(1, new List<ItemStack>());
+        }
+
+        /// <summary>
+        /// Clears the save. We avoid calling CloudSave delete APIs to keep compatibility;
+        /// we simply overwrite with an empty stage + empty inventory.
+        /// </summary>
+        public Task DeleteSaveAsync()
+        {
+            return SaveAsync(0, new List<ItemStack>());
+        }
+
     }
 }

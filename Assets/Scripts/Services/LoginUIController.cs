@@ -1,183 +1,237 @@
+using System;
+using System.Threading.Tasks;
+using Services;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Services
+namespace UI
 {
     /// <summary>
-    /// UI controller for Register/Login.
-    /// 
-    /// Desired behavior:
-    /// - Register (new user) -> immediately start from Stage 1 (first scene).
-    /// - Login (existing user) -> load last saved progress (stage + inventory) from Cloud Save
-    ///   and continue from that stage (defaults to Stage 1 if no save exists yet).
+    /// Controls the "Open" scene UI flow:
+    /// 1) SignInPanel (username + password + Register/Login)
+    /// 2) LargeBoard (Intro panel with Start New / Load)
+    ///
+    /// The two panels live in the same scene, but only one is visible at a time.
     /// </summary>
-    /// <remarks>
-    /// Button callbacks are <c>async void</c> because Unity UI events don't support Task signatures.
-    /// Exceptions are caught and surfaced to the status label.
-    /// </remarks>
-    public class LoginUIController : MonoBehaviour
+    public sealed class LoginUIController : MonoBehaviour
     {
-        [Header("UI")]
+        [Header("Panels")]
+        [SerializeField] private GameObject signInPanel;
+        [SerializeField] private GameObject introPanel;
+
+        [Header("Sign-in UI")]
         [SerializeField] private TMP_InputField usernameInput;
         [SerializeField] private TMP_InputField passwordInput;
-
-        [Header("Buttons")]
         [SerializeField] private Button registerButton;
         [SerializeField] private Button loginButton;
+        [SerializeField] private TMP_Text signInStatusText;
 
-        [Header("Optional Buttons (can be null / removed from your menu)")]
-        [SerializeField] private Button logoutButton;
+        [Header("Intro UI")]
+        [SerializeField] private Button startNewButton;
         [SerializeField] private Button loadButton;
-        [SerializeField] private Button saveButton;
-
-        [Header("Status")]
-        [SerializeField] private TMP_Text statusText;
+        [SerializeField] private TMP_Text introStatusText; // optional (can be null)
 
         private bool _busy;
 
+        private void Reset()
+        {
+            // Try to auto-wire common defaults when the script is first added.
+            signInPanel = gameObject;
+        }
+
         private void Awake()
         {
-            // Wire required buttons.
+            // If you forgot to set panels, fall back to the current GameObject for sign-in.
+            if (signInPanel == null) signInPanel = gameObject;
+
             if (registerButton != null) registerButton.onClick.AddListener(OnRegisterClicked);
             if (loginButton != null) loginButton.onClick.AddListener(OnLoginClicked);
-
-            // Optional legacy/dev buttons (only if you still keep them in the scene).
-            if (logoutButton != null) logoutButton.onClick.AddListener(OnLogoutClicked);
+            if (startNewButton != null) startNewButton.onClick.AddListener(OnStartNewClicked);
             if (loadButton != null) loadButton.onClick.AddListener(OnLoadClicked);
-            if (saveButton != null) saveButton.onClick.AddListener(OnSaveClicked);
-
-            SetStatus("Ready.");
         }
 
-        private void SetBusy(bool busy)
+        private async void Start()
         {
-            _busy = busy;
+            ShowSignIn();
 
-            if (registerButton != null) registerButton.interactable = !busy;
-            if (loginButton != null) loginButton.interactable = !busy;
-
-            if (logoutButton != null) logoutButton.interactable = !busy;
-            if (loadButton != null) loadButton.interactable = !busy;
-            if (saveButton != null) saveButton.interactable = !busy;
+            // If user is already signed in (Editor play mode / session restore), skip straight to intro panel.
+            try
+            {
+                if (AuthManager.Instance != null && AuthManager.Instance.IsSignedIn)
+                    await ShowIntroPanelAsync();
+            }
+            catch
+            {
+                // ignore
+            }
         }
 
-        /// <summary>
-        /// Register a new account and immediately start Stage 1.
-        /// </summary>
+        private void ShowSignIn()
+        {
+            if (signInPanel != null) signInPanel.SetActive(true);
+            if (introPanel != null) introPanel.SetActive(false);
+
+            SetSignInStatus("");
+            SetIntroStatus("");
+            SetButtonsInteractable(true);
+        }
+
+        private async Task ShowIntroPanelAsync()
+        {
+            if (signInPanel != null) signInPanel.SetActive(false);
+            if (introPanel != null) introPanel.SetActive(true);
+
+            SetSignInStatus("");
+            await RefreshLoadButtonAsync();
+        }
+
+        private async Task RefreshLoadButtonAsync()
+        {
+            bool hasSave = false;
+
+            if (CloudSaveStore.Instance != null)
+                hasSave = await CloudSaveStore.Instance.HasSaveAsync();
+
+            if (loadButton != null)
+                loadButton.interactable = hasSave && !_busy;
+
+            if (!hasSave)
+                SetIntroStatus("No saved progress found.");
+            else
+                SetIntroStatus("");
+        }
+
+        private void SetButtonsInteractable(bool enabled)
+        {
+            if (registerButton != null) registerButton.interactable = enabled;
+            if (loginButton != null) loginButton.interactable = enabled;
+
+            if (startNewButton != null) startNewButton.interactable = enabled;
+            if (loadButton != null) loadButton.interactable = enabled;
+        }
+
+        private void SetSignInStatus(string msg)
+        {
+            if (signInStatusText != null) signInStatusText.text = msg ?? "";
+        }
+
+        private void SetIntroStatus(string msg)
+        {
+            if (introStatusText != null) introStatusText.text = msg ?? "";
+        }
+
+        private string Username => usernameInput != null ? usernameInput.text.Trim() : "";
+        private string Password => passwordInput != null ? passwordInput.text : "";
+
         private async void OnRegisterClicked()
         {
             if (_busy) return;
-            SetBusy(true);
 
-            try
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
             {
-                SetStatus("Registering...");
-                await AuthManager.Instance.RegisterAsync(usernameInput.text, passwordInput.text);
-                SetStatus($"Registered & Signed In. PlayerId={AuthManager.Instance.PlayerId}");
+                SetSignInStatus("Please enter a username and password.");
+                return;
+            }
 
-                SetStatus("Starting new game...");
-                await GameFlowManager.Instance.StartGameFromStageAsync(1);
-            }
-            catch (System.Exception e)
+            await RunBusyAsync(async () =>
             {
-                SetStatus("Register failed: " + e.Message);
-                Debug.LogException(e);
-            }
-            finally
-            {
-                SetBusy(false);
-            }
+                SetSignInStatus("Registering...");
+                await AuthManager.Instance.RegisterAsync(Username, Password);
+                SetSignInStatus("");
+                await ShowIntroPanelAsync();
+            });
         }
 
-        /// <summary>
-        /// Login and continue from last saved stage (Cloud Save).
-        /// </summary>
         private async void OnLoginClicked()
         {
             if (_busy) return;
-            SetBusy(true);
 
-            try
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
             {
-                SetStatus("Logging in...");
-                await AuthManager.Instance.LoginAsync(usernameInput.text, passwordInput.text);
-                SetStatus($"Signed In. PlayerId={AuthManager.Instance.PlayerId}");
+                SetSignInStatus("Please enter a username and password.");
+                return;
+            }
 
-                // Continue from last save (defaults to stage 1 if no save exists).
-                SetStatus("Loading last checkpoint...");
-                await GameFlowManager.Instance.LoadAndApplyAsync();
-            }
-            catch (System.Exception e)
+            await RunBusyAsync(async () =>
             {
-                SetStatus("Login failed: " + e.Message);
-                Debug.LogException(e);
-            }
-            finally
-            {
-                SetBusy(false);
-            }
+                SetSignInStatus("Signing in...");
+                await AuthManager.Instance.LoginAsync(Username, Password);
+                SetSignInStatus("");
+                await ShowIntroPanelAsync();
+            });
         }
 
-        // -----------------------------
-        // Optional / dev buttons
-        // -----------------------------
-
-        private void OnLogoutClicked()
+        private async void OnStartNewClicked()
         {
             if (_busy) return;
-            AuthManager.Instance.Logout();
-            SetStatus("Signed out.");
+
+            await RunBusyAsync(async () =>
+            {
+                SetIntroStatus("Starting new run...");
+
+                if (CloudSaveStore.Instance != null)
+                {
+                    // Reset previous progress (if any), then initialize a clean save at stage 1.
+                    await CloudSaveStore.Instance.DeleteSaveAsync();
+                    await CloudSaveStore.Instance.SaveNewGameAsync(startStage: "1");
+                }
+
+                // Go to the first stage scene.
+                if (GameFlowManager.Instance != null)
+                    await GameFlowManager.Instance.StartGameFromStageAsync(1);
+            });
         }
 
         private async void OnLoadClicked()
         {
             if (_busy) return;
-            SetBusy(true);
+
+            await RunBusyAsync(async () =>
+            {
+                bool hasSave = CloudSaveStore.Instance != null && await CloudSaveStore.Instance.HasSaveAsync();
+                if (!hasSave)
+                {
+                    SetIntroStatus("Nothing to load yet.");
+                    return;
+                }
+
+                SetIntroStatus("Loading...");
+                if (GameFlowManager.Instance != null)
+                    await GameFlowManager.Instance.LoadAndApplyAsync();
+            });
+        }
+
+        private async Task RunBusyAsync(Func<Task> work)
+        {
+            _busy = true;
+            SetButtonsInteractable(false);
 
             try
             {
-                SetStatus("Loading from Cloud Save...");
-                await GameFlowManager.Instance.LoadAndApplyAsync();
-                SetStatus("Loaded & applied.");
+                await work();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                SetStatus("Load failed: " + e.Message);
-                Debug.LogException(e);
+                // Keep error messages short for UI.
+                SetSignInStatus($"Error: {e.Message}");
+                SetIntroStatus($"Error: {e.Message}");
             }
             finally
             {
-                SetBusy(false);
-            }
-        }
+                _busy = false;
 
-        private async void OnSaveClicked()
-        {
-            if (_busy) return;
-            SetBusy(true);
-
-            try
-            {
-                SetStatus("Saving...");
-                await CloudSaveStore.Instance.SaveAsync(GameFlowManager.Instance.CurrentStage, null);
-                SetStatus("Saved (stage only).");
+                // Re-enable whatever panel is currently visible.
+                if (signInPanel != null && signInPanel.activeInHierarchy)
+                {
+                    SetButtonsInteractable(true);
+                }
+                else
+                {
+                    SetButtonsInteractable(true);
+                    await RefreshLoadButtonAsync();
+                }
             }
-            catch (System.Exception e)
-            {
-                SetStatus("Save failed: " + e.Message);
-                Debug.LogException(e);
-            }
-            finally
-            {
-                SetBusy(false);
-            }
-        }
-
-        private void SetStatus(string msg)
-        {
-            if (statusText != null) statusText.text = msg;
-            Debug.Log(msg);
         }
     }
 }
