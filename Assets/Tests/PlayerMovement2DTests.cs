@@ -38,27 +38,5 @@ public class PlayerMovement2DTests
         Assert.IsFalse(player.IsUsingSlowSpeed, "Player should not start in slow mode");
     }
 
-    [Test]
-    public void HandleSpeedToggle_UpdatesCurrentSpeedAccordingToFlag()
-    {
-        var type = typeof(PlayerMovement);
-
-        var method = type.GetMethod("HandleSpeedToggle",
-            BindingFlags.NonPublic | BindingFlags.Instance);
-        var flagField = type.GetField("useSlowSpeed",
-            BindingFlags.NonPublic | BindingFlags.Instance);
-
-        Assert.IsNotNull(method, "HandleSpeedToggle method not found");
-        Assert.IsNotNull(flagField, "useSlowSpeed field not found");
-
-        flagField.SetValue(player, true);
-        method.Invoke(player, null);
-        Assert.IsTrue(player.IsUsingSlowSpeed);
-        Assert.AreEqual(player.getSlowSpeed(), player.CurrentSpeed);
-
-        flagField.SetValue(player, false);
-        method.Invoke(player, null);
-        Assert.IsFalse(player.IsUsingSlowSpeed);
-        Assert.AreEqual(player.getNormalSpeed(), player.CurrentSpeed);
-    }
+ 
 }

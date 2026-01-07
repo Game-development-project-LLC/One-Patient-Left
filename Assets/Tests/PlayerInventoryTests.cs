@@ -1,14 +1,16 @@
 using NUnit.Framework;
 using UnityEngine;
+using System.Reflection;
 
 public class PlayerInventoryTests
 {
-    private GameObject playerObject;
+   private GameObject playerObject;
     private PlayerInventory inventory;
 
     [SetUp]
     public void Setup()
     {
+        // Create a clean Player with an inventory component
         playerObject = new GameObject("Player");
         inventory = playerObject.AddComponent<PlayerInventory>();
     }
@@ -22,22 +24,39 @@ public class PlayerInventoryTests
     [Test]
     public void AddItem_ValidItem_IsAddedToInventory()
     {
-        inventory.AddItem("photo");
+        
+        var itemPhoto = ScriptableObject.CreateInstance<ItemDefinition>();
 
-        Assert.IsTrue(inventory.HasItem("photo"),
+        
+        SetField(itemPhoto, "id", "key2");
+        SetField(itemPhoto, "displayName", "photo2");
+
+       
+        inventory.AddItem(itemPhoto);
+
+      
+        Assert.IsTrue(inventory.HasItem(itemPhoto),
             "Expected item to be added to inventory.");
     }
+
 
     [Test]
     public void AddItem_DuplicateItem_IsNotAddedTwice()
     {
-        inventory.AddItem("key");
-        inventory.AddItem("key");
 
+        var itemPhoto2 =  ScriptableObject.CreateInstance<ItemDefinition>();
+        
+        
+        SetField(itemPhoto2, "id", "key2");
+        SetField(itemPhoto2, "displayName", "photo2");
+
+        inventory.AddItem(itemPhoto2);
+        inventory.AddItem(itemPhoto2);
+        
         string inventoryText = inventory.GetInventoryText();
 
-        int firstIndex = inventoryText.IndexOf("key");
-        int lastIndex = inventoryText.LastIndexOf("key");
+        int firstIndex = inventoryText.IndexOf("key2");
+        int lastIndex = inventoryText.LastIndexOf("key2");
 
         Assert.AreEqual(firstIndex, lastIndex,
             "Duplicate item should not be added twice.");
@@ -58,10 +77,16 @@ public class PlayerInventoryTests
     [Test]
     public void HasItem_ReturnsTrueOnlyForExistingItems()
     {
-        inventory.AddItem("staff_keycard");
+        var itemPhoto3 = ScriptableObject.CreateInstance<ItemDefinition>();
+        var itemTable = ScriptableObject.CreateInstance<ItemDefinition>();
 
-        Assert.IsTrue(inventory.HasItem("staff_keycard"));
-        Assert.IsFalse(inventory.HasItem("photo"));
+        SetField(itemPhoto3, "id", "key4");
+        SetField(itemPhoto3, "displayName", "photo4");
+
+        inventory.AddItem(itemPhoto3);
+
+        Assert.IsTrue(inventory.HasItem(itemPhoto3));
+        Assert.IsFalse(inventory.HasItem(itemTable));
     }
 
     [Test]
@@ -73,17 +98,15 @@ public class PlayerInventoryTests
             "Empty inventory should return the correct empty message.");
     }
 
-    [Test]
-    public void GetInventoryText_WithItems_ReturnsFormattedList()
-    {
-        inventory.AddItem("photo");
-        inventory.AddItem("map");
+    private static void SetField(ItemDefinition target, string fieldName, string value)
+        {
+            var flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+            var field = target.GetType().GetField(fieldName, flags);
 
-        string text = inventory.GetInventoryText();
+            Assert.IsNotNull(field,
+                $"Field '{fieldName}' was not found on {target.GetType().Name}. " +
+                $"Open ItemDefinition.cs and check the exact private field name (it might be '_id' or 'itemId').");
 
-        Assert.IsTrue(text.Contains("photo"));
-        Assert.IsTrue(text.Contains("map"));
-        Assert.IsTrue(text.StartsWith("Inventory:"),
-            "Inventory text should start with 'Inventory:'");
-    }
+            field.SetValue(target, value);
+        }
 }

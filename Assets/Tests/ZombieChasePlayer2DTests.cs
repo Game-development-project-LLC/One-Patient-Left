@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class ZombieChasePlayer2DTests
 {
-    private T GetPrivateField<T>(object instance, string fieldName)
+    private float GetPrivateField(object instance, string fieldName)
     {
         var field = instance.GetType()
             .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.IsNotNull(field, $"Field '{fieldName}' not found.");
-        return (T)field.GetValue(instance);
+        return (float)field.GetValue(instance);
     }
 
     private void SetPrivateField(object instance, string fieldName, object value)
@@ -27,14 +27,13 @@ public class ZombieChasePlayer2DTests
         zombieObject.AddComponent<Rigidbody2D>();
         var zombie = zombieObject.AddComponent<ZombieChasePlayer2D>();
 
-        float moveSpeed    = GetPrivateField<float>(zombie, "moveSpeed");
-        float detectionRad = GetPrivateField<float>(zombie, "detectionRadius");
-        float loseRad      = GetPrivateField<float>(zombie, "loseRadius");
+        float moveSpeed    = GetPrivateField(zombie, "chaseSpeed");
+        float detectionRan = GetPrivateField(zombie, "detectionRange");
+        float loseRan      = GetPrivateField(zombie, "loseRangeMultiplier");
 
         Assert.Greater(moveSpeed, 0f, "moveSpeed should be positive.");
-        Assert.Greater(loseRad, detectionRad,
-            "loseRadius should be larger than detectionRadius.");
-
+        Assert.Greater(detectionRan, loseRan,
+            "detectionRange should be larger than loseRangeMultiplier .");
         Object.DestroyImmediate(zombieObject);
     }
 
@@ -46,8 +45,8 @@ public void Awake_MatchesPlayerSpeed_WhenPlayerExists()
     playerObject.AddComponent<Rigidbody2D>();
     var playerMovement = playerObject.AddComponent<PlayerMovement>();
 
-    // Set player's normalSpeed via reflection
-    SetPrivateField(playerMovement, "normalSpeed", 6f);
+    // Set player's slowSpeed via reflection
+    SetPrivateField(playerMovement, "slowSpeed", 2.2f);
 
     // Create zombie afterwards
     var zombieObject = new GameObject("Zombie");
@@ -61,10 +60,10 @@ public void Awake_MatchesPlayerSpeed_WhenPlayerExists()
     awakeMethod.Invoke(zombie, null);
 
     // Read moveSpeed after Awake
-    float zombieSpeed = GetPrivateField<float>(zombie, "moveSpeed");
+    float zombieSpeed = GetPrivateField(zombie,"chaseSpeed");
 
-    Assert.AreEqual(6f, zombieSpeed, 0.0001f,
-        "Zombie moveSpeed should match player's normalSpeed when matchPlayerSpeed is true.");
+    Assert.AreEqual(2.2f, zombieSpeed, 0.0001f,
+        "Zombie moveSpeed should match player's slowSpeed when matchPlayerSpeed is true.");
 
     Object.DestroyImmediate(playerObject);
     Object.DestroyImmediate(zombieObject);
